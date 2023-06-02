@@ -1,0 +1,40 @@
+---
+default_language_version:
+    python: python3.10 # Using .python-version would be nice
+repos:
+    # Autoformatters
+    - repo: https://github.com/astral-sh/ruff-pre-commit
+      rev: v0.0.270
+      hooks:
+          - id: ruff
+    - repo: https://github.com/grantjenks/blue
+      rev: v0.9.1
+      hooks:
+          - id: blue
+    - repo: https://github.com/jazzband/pip-tools
+      rev: 6.13.0
+      hooks:
+          - id: pip-compile
+    - repo: https://github.com/pre-commit/mirrors-prettier
+      rev: v2.7.1
+      hooks:
+          - id: prettier
+            types_or:
+                - json
+                - yaml
+                - toml
+
+    # Linters
+    - repo: https://github.com/adrienverge/yamllint.git
+      rev: v1.32.0
+      hooks:
+          - id: yamllint
+    - repo: local
+      hooks:
+          - id: mypy
+            entry: 'mypy .'
+            language: system
+            name: mypy
+            types:
+                - python
+            verbose: true
