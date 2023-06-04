@@ -71,6 +71,8 @@ typing-extensions==4.6.3
     #   mypy
 virtualenv==20.23.0
     # via pre-commit
+wheel==0.40.0
+    # via -r requirements.in
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
