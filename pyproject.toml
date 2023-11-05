@@ -1,9 +1,13 @@
-[blue]
+[tool.black]
 line-length = 120
 skip-magic-trailing-comma = true
+skip-string-normalization = true
 
-[mypy]
-plugins = 'mypy_django_plugin.main'
+[tool.ruff]
+line-length = 120
 
-[mypy_django_plugin]
-ignore_missing_model_attributes = true
+[tool.mypy]
+plugins = ['mypy_django_plugin.main']
+
+[tool.django-stubs]
+django_settings_module = 'myproject.settings'
