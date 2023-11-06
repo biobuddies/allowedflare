@@ -10,4 +10,4 @@ line-length = 120
 plugins = ['mypy_django_plugin.main']
 
 [tool.django-stubs]
-django_settings_module = 'myproject.settings'
+django_settings_module = 'demodj.settings'
