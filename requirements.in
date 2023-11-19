@@ -1,5 +1,6 @@
 # Run-time dependencies
 django
+django-extensions
 pyjwt
 requests
 
@@ -8,4 +9,5 @@ django-stubs
 mypy
 pre-commit
 types-requests
-wheel
+
+# pip-tools and wheel will be installed by Dockerfile

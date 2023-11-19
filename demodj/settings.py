@@ -12,16 +12,22 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from ast import literal_eval
 from pathlib import Path
-from os import environ, getenv
+from os import getenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Use a real secret key, set DEBUG to False, and narrow ALLOWED_HOSTS in production
+# Use a real secret key and set DEBUG to False in production
+ALLOWEDFLARE_ACCESS_URL = getenv('ALLOWEDFLARE_ACCESS_URL', 'off')
+ALLOWEDFLARE_AUDIENCE = getenv('ALLOWEDFLARE_AUDIENCE', '')
+ALLOWEDFLARE_PRIVATE_DOMAIN = getenv('ALLOWEDFLARE_PRIVATE_DOMAIN', '')
+DEBUG = bool(literal_eval(getenv('DEMODJ_DEBUG', 'True')))
 SECRET_KEY = getenv('DEMODJ_SECRET_KEY', 'django-insecure-+u()*ykdn+20wd88=-ou3)c7#h)-psb5w80)z=jr&&&wr)9)0z')
-DEBUG = literal_eval(getenv('DEMODJ_DEBUG', 'True'))
-ALLOWEDFLARE_PRIVATE_DOMAIN = environ['ALLOWEDFLARE_PRIVATE_DOMAIN']
-ALLOWED_HOSTS = (f'.{ALLOWEDFLARE_PRIVATE_DOMAIN}',)
-CSRF_TRUSTED_ORIGINS = (f'https://*.{ALLOWEDFLARE_PRIVATE_DOMAIN}',)
+if ALLOWEDFLARE_PRIVATE_DOMAIN:
+    ALLOWED_HOSTS = (f'.{ALLOWEDFLARE_PRIVATE_DOMAIN}',)
+    CSRF_TRUSTED_ORIGINS = (f'https://*.{ALLOWEDFLARE_PRIVATE_DOMAIN}',)
+
+# "When DEBUG is True and ALLOWED_HOSTS is empty, the host is validated against ['.localhost', '127.0.0.1', '[::1]']."
+# https://docs.djangoproject.com/en/4.2/ref/settings/#allowed-hosts
 
 # Application definition
 
@@ -100,11 +106,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'static'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-CLOUDFLARE_ACCESS_AUD = environ['CLOUDFLARE_ACCESS_AUD']
-CLOUDFLARE_ACCESS_URL = environ['CLOUDFLARE_ACCESS_URL']
