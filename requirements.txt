@@ -17,8 +17,11 @@ distlib==0.3.6
 django==4.2.1
     # via
     #   -r requirements.in
+    #   django-extensions
     #   django-stubs
     #   django-stubs-ext
+django-extensions==3.2.3
+    # via -r requirements.in
 django-stubs==4.2.0
     # via -r requirements.in
 django-stubs-ext==4.2.0

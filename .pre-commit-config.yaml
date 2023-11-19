@@ -58,11 +58,12 @@ repos:
             entry: 'mypy .'
             language: system
             name: mypy
+            pass_filenames: false
+            stages:
+                - manual
             types:
                 - python
             verbose: true
-            stages:
-                - manual
 
           - id: pip-check
             entry: pip check

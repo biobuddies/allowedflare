@@ -1,7 +1,8 @@
 import logging
-from datetime import timezone as datetime_timezone
+from datetime import datetime, timezone as datetime_timezone
 from typing import Any, Optional
 
+from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
 from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import User
@@ -21,8 +22,8 @@ def defaults_for_user(decoded_token: str) -> dict:
     return {'is_staff': True}
 
 
-cache_updated = django_utils_timezone.datetime.fromtimestamp(0, tz=datetime_timezone.utc)
-cached_keys: list[str] = []
+cache_updated = datetime.fromtimestamp(0, tz=datetime_timezone.utc)
+cached_keys: list[RSAPublicKey] = []
 
 
 def fetch_or_reuse_keys():
@@ -32,20 +33,15 @@ def fetch_or_reuse_keys():
     if cache_updated + django_utils_timezone.timedelta(days=1) < now:
         response = requests.get(f'{settings.ALLOWEDFLARE_ACCESS_URL}/cdn-cgi/access/certs').json()
         if response.get('keys'):
-            cached_keys = response['keys']
+            cached_keys = [RSAAlgorithm.from_jwk(key) for key in response['keys']]
             cache_updated = now
     return cached_keys
 
 
-def decode_token(cf_authorization: HttpRequest):
+def decode_token(cf_authorization: str):
     for key in fetch_or_reuse_keys():
         try:
-            return decode(
-                cf_authorization,
-                key=RSAAlgorithm.from_jwk(key),
-                audience=settings.ALLOWEDFLARE_AUDIENCE,
-                algorithms=['RS256'],
-            )
+            return decode(cf_authorization, key=key, audience=settings.ALLOWEDFLARE_AUDIENCE, algorithms=['RS256'])
         except InvalidSignatureError:
             pass
     return None
@@ -60,3 +56,8 @@ class Allowedflare(BaseBackend):
             return None
 
         user, new = User.objects.update_or_create(email=token['email'], defaults=defaults_for_user(token))
+        if new:
+            logger.info(f'New user {user.email} authenticated using Allowedflare')
+        else:
+            logger.debug(f'Existing user {user.email} authenticated using Allowedflare')
+        return user
