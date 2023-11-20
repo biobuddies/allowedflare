@@ -50,7 +50,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-AUTHENTICATION_BACKENDS = ['django_allowedflare.Allowedflare']
+AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend', 'django_allowedflare.Allowedflare']
 
 ROOT_URLCONF = 'demodj.urls'
 
@@ -112,3 +112,11 @@ STATIC_ROOT = BASE_DIR / 'static'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOG_LEVEL = getenv('DEMODJ_LOG_LEVEL', 'DEBUG' if DEBUG else 'INFO')
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {'console': {'class': 'logging.StreamHandler'}},
+    'root': {'handlers': ['console'], 'level': LOG_LEVEL},
+}

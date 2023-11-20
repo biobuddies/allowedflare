@@ -2,7 +2,7 @@
 """Django's command-line utility for administrative tasks."""
 import sys
 
-import set_default_django_settings_module  # noqa: F401
+import default
 
 
 def main():
@@ -19,6 +19,7 @@ def main():
             'available on your PYTHONPATH environment variable? Did you '
             'forget to activate a virtual environment?'
         ) from exc
+    default.settings_module()
     execute_from_command_line(sys.argv)
 
 

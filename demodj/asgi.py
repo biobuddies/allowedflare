@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/4.2/howto/deployment/asgi/
 
 from django.core.asgi import get_asgi_application
 
-import set_default_django_settings_module  # noqa: F401
+import default
 
+default.settings_module()
 application = get_asgi_application()

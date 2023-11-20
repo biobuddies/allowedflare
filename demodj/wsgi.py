@@ -8,7 +8,9 @@ https://docs.djangoproject.com/en/4.2/howto/deployment/wsgi/
 """
 
 
-from django.core.wsgi import get_wsgi_application  # noqa: F401
+from django.core.wsgi import get_wsgi_application
 
+import default
 
+default.settings_module()
 application = get_wsgi_application()
