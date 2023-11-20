@@ -1,10 +1,11 @@
 # Run-time dependencies
-Django
-jwt
+django
+pyjwt
+requests
 
 # Development tools, build-time dependencies
 django-stubs
 mypy
 pre-commit
-types-jwt
 types-requests
+wheel
