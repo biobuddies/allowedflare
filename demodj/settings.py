@@ -21,12 +21,15 @@ ALLOWEDFLARE_ACCESS_URL = getenv('ALLOWEDFLARE_ACCESS_URL', 'off')
 ALLOWEDFLARE_AUDIENCE = getenv('ALLOWEDFLARE_AUDIENCE', '')
 ALLOWEDFLARE_PRIVATE_DOMAIN = getenv('ALLOWEDFLARE_PRIVATE_DOMAIN', '')
 DEBUG = bool(literal_eval(getenv('DEMODJ_DEBUG', 'True')))
-SECRET_KEY = getenv('DEMODJ_SECRET_KEY', 'django-insecure-+u()*ykdn+20wd88=-ou3)c7#h)-psb5w80)z=jr&&&wr)9)0z')
+SECRET_KEY = getenv(
+    'DEMODJ_SECRET_KEY', 'django-insecure-+u()*ykdn+20wd88=-ou3)c7#h)-psb5w80)z=jr&&&wr)9)0z'
+)
 if ALLOWEDFLARE_PRIVATE_DOMAIN:
     ALLOWED_HOSTS = (f'.{ALLOWEDFLARE_PRIVATE_DOMAIN}',)
     CSRF_TRUSTED_ORIGINS = (f'https://*.{ALLOWEDFLARE_PRIVATE_DOMAIN}',)
 
-# "When DEBUG is True and ALLOWED_HOSTS is empty, the host is validated against ['.localhost', '127.0.0.1', '[::1]']."
+# "When DEBUG is True and ALLOWED_HOSTS is empty, the host is validated against
+# ['.localhost', '127.0.0.1', '[::1]']."
 # https://docs.djangoproject.com/en/4.2/ref/settings/#allowed-hosts
 
 # Application definition
@@ -50,7 +53,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend', 'django_allowedflare.Allowedflare']
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'django_allowedflare.Allowedflare',
+]
 
 ROOT_URLCONF = 'demodj.urls'
 

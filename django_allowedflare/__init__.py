@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timezone as datetime_timezone
+from datetime import datetime, timedelta, timezone as datetime_timezone
 from typing import Any
 
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
@@ -26,10 +26,11 @@ def fetch_or_reuse_keys() -> list[RSAPublicKey]:
     global cache_updated, cached_keys
     now = django_utils_timezone.now()
     # As of June 2023, signing keys are documented as rotated every 6 weeks
-    if cache_updated + django_utils_timezone.timedelta(days=1) < now:
+    if cache_updated + timedelta(days=1) < now:
         response = requests.get(f'{settings.ALLOWEDFLARE_ACCESS_URL}/cdn-cgi/access/certs').json()
         if response.get('keys'):
-            cached_keys = [RSAAlgorithm.from_jwk(key) for key in response['keys']]
+            decoded_keys = [RSAAlgorithm.from_jwk(key) for key in response['keys']]
+            cached_keys = [key for key in decoded_keys if isinstance(key, RSAPublicKey)]
             cache_updated = now
     return cached_keys
 
@@ -37,18 +38,31 @@ def fetch_or_reuse_keys() -> list[RSAPublicKey]:
 def decode_token(cf_authorization: str) -> dict:
     for key in fetch_or_reuse_keys():
         try:
-            return decode(cf_authorization, key=key, audience=settings.ALLOWEDFLARE_AUDIENCE, algorithms=['RS256'])
+            return decode(
+                cf_authorization,
+                key=key,
+                audience=settings.ALLOWEDFLARE_AUDIENCE,
+                algorithms=['RS256'],
+            )
         except InvalidSignatureError:
             pass
     return {}
 
 
 def defaults_for_user(token: dict) -> dict:
-    return getattr(settings, 'ALLOWEDFLARE_DEFAULTS_FOR_USER', lambda token: {'is_staff': True})(token)
+    return getattr(settings, 'ALLOWEDFLARE_DEFAULTS_FOR_USER', lambda token: {'is_staff': True})(
+        token
+    )
 
 
 class Allowedflare(ModelBackend):
-    def authenticate(self, request: HttpRequest | None, **kwargs: Any) -> User | None:
+    def authenticate(
+        self,
+        request: HttpRequest | None,
+        username: str | None = None,
+        password: str | None = None,
+        **kwargs: Any,
+    ) -> User | None:
         if not request or 'CF_Authorization' not in request.COOKIES:
             logger.warning('CF_Authorization cookie missing')
             return None
@@ -60,7 +74,9 @@ class Allowedflare(ModelBackend):
             logger.warning(f'Valid token missing email {token}')
 
         user, new = User.objects.update_or_create(
-            username=clean_username(token['email']), email=token['email'], defaults=defaults_for_user(token)
+            username=clean_username(token['email']),
+            email=token['email'],
+            defaults=defaults_for_user(token),
         )
 
         if new:

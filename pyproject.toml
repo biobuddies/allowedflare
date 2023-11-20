@@ -1,10 +1,10 @@
 [tool.black]
-line-length = 120
+line-length = 100
 skip-magic-trailing-comma = true
 skip-string-normalization = true
 
 [tool.ruff]
-line-length = 120
+line-length = 100
 
 [tool.mypy]
 plugins = ['mypy_django_plugin.main']
