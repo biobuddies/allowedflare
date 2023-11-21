@@ -8,17 +8,24 @@ asgiref==3.7.2
     # via django
 certifi==2023.5.7
     # via requests
+cffi==1.16.0
+    # via cryptography
 cfgv==3.3.1
     # via pre-commit
 charset-normalizer==3.1.0
     # via requests
+cryptography==41.0.5
+    # via -r requirements.in
 distlib==0.3.6
     # via virtualenv
 django==4.2.1
     # via
     #   -r requirements.in
+    #   django-extensions
     #   django-stubs
     #   django-stubs-ext
+django-extensions==3.2.3
+    # via -r requirements.in
 django-stubs==4.2.0
     # via -r requirements.in
 django-stubs-ext==4.2.0
@@ -41,9 +48,11 @@ platformdirs==3.5.1
     # via virtualenv
 pre-commit==3.3.2
     # via -r requirements.in
+pycparser==2.21
+    # via cffi
 pyjwt==2.8.0
     # via -r requirements.in
-pyyaml==6.0
+pyyaml==6.0.1
     # via pre-commit
 requests==2.31.0
     # via -r requirements.in
@@ -66,8 +75,6 @@ urllib3==2.0.3
     # via requests
 virtualenv==20.23.0
     # via pre-commit
-wheel==0.40.0
-    # via -r requirements.in
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

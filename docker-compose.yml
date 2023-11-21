@@ -1,0 +1,35 @@
+---
+version: '3.9'
+services:
+    postgres:
+        image: postgres:15
+        command: postgres -p 5501
+        environment:
+            - POSTGRES_HOST_AUTH_METHOD=trust
+        ports:
+            - 5501:5501
+        volumes:
+            - postgres:/var/lib/postgresql/data
+
+    web:
+        build: .
+        command: python -m manage runserver
+        depends_on:
+            - postgres
+        environment:
+            - ALLOWEDFLARE_ACCESS_URL
+            - ALLOWEDFLARE_AUDIENCE
+            - ALLOWEDFLARE_PRIVATE_DOMAIN
+        ports:
+            # Should match manage.py
+            - 8001:8001
+        volumes:
+            - .:/srv
+
+networks:
+    interoperation:
+        name: interoperation
+        external: true
+
+volumes:
+    postgres:

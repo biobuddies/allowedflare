@@ -13,6 +13,7 @@ repos:
       rev: v4.4.0
       hooks:
           - id: double-quote-string-fixer
+          - id: end-of-file-fixer
     - repo: https://github.com/psf/black
       rev: 23.10.1
       hooks:
@@ -58,11 +59,12 @@ repos:
             entry: 'mypy .'
             language: system
             name: mypy
+            pass_filenames: false
+            stages:
+                - manual
             types:
                 - python
             verbose: true
-            stages:
-                - manual
 
           - id: pip-check
             entry: pip check
