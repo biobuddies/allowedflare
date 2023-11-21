@@ -1,7 +1,34 @@
+[build-system]
+requires = ['setuptools>=61.0', 'setuptools_scm[toml]>=6.2', 'wheel']
+build-backend = 'setuptools.build_meta'
+
+[project]
+classifiers = [
+    'Programming Language :: Python :: 3',
+    'License :: OSI Approved :: BSD License',
+    'Operating System :: OS Independent',
+    'Topic :: Internet :: WWW/HTTP :: Session',
+]
+description = 'Authenticate to Django with JSON Web Tokens (JWTs) signed by Cloudflare Access'
+dependencies = [
+    'cryptography',
+    'pyjwt',
+    'requests',
+]
+dynamic = ['version']
+name = 'allowedflare'
+readme = 'README.md'
+
+[project.urls]
+Homepage = 'https://github.com/covracer/allowedflare'
+
 [tool.black]
 line-length = 100
 skip-magic-trailing-comma = true
 skip-string-normalization = true
+
+[tool.django-stubs]
+django_settings_module = 'demodj.settings'
 
 [tool.ruff]
 line-length = 100
@@ -9,5 +36,7 @@ line-length = 100
 [tool.mypy]
 plugins = ['mypy_django_plugin.main']
 
-[tool.django-stubs]
-django_settings_module = 'demodj.settings'
+[tool.setuptools]
+packages = ['django_allowedflare']
+
+[tool.setuptools_scm]

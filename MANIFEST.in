@@ -1,0 +1,5 @@
+exclude .*
+exclude *
+exclude .github/workflows/*
+exclude demodj/*
+include pyproject.toml
