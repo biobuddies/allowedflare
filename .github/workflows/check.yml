@@ -12,12 +12,25 @@ jobs:
             - uses: actions/cache@v3
               with:
                   path: ~/.cache/pip
-                  key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('requirements.in') }}
-                  restore-keys: ${{ runner.os }}-pip-
+                  key: |
+                      ${{ runner.os }}-pip
+                      ${{ hashFiles('pyproject.toml') }}
+                      ${{ hashFiles('requirements.in') }}
+                  restore-keys: ${{ runner.os }}-pip
             - uses: actions/cache@v3
               with:
                   path: ~/.cache/pre-commit
-                  key: ${{ runner.os }}-pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
-                  restore-keys: ${{ runner.os }}-pre-commit-
-            - run: pip install pip-tools && pip-sync
+                  key: |
+                      ${{ runner.os }}-pre-commit
+                      ${{ hashFiles('.pre-commit-config.yaml') }}
+                  restore-keys: ${{ runner.os }}-pre-commit
+            - run: pip install --upgrade pip && pip install pip-tools && pip-sync
+              env:
+                  PIP_PROGRESS_BAR: 'off'
             - run: source includes.sh && pcam --color always --show-diff-on-failure
+            - run: python -m build
+            - run: twine check dist/*
+            - run: python -m manage check
+            - run: python -m manage makemigrations --check
+            - run: docker compose build
+            - run: docker compose run web python -m manage test
