@@ -4,18 +4,18 @@ default_language_version:
 repos:
     # Autoformatters
     - repo: https://github.com/astral-sh/ruff-pre-commit
-      rev: v0.0.270
+      rev: v0.1.14
       hooks:
           - id: ruff
             args:
                 - --fix
     - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: v4.4.0
+      rev: v4.5.0
       hooks:
           - id: double-quote-string-fixer
           - id: end-of-file-fixer
     - repo: https://github.com/psf/black
-      rev: 23.10.1
+      rev: 23.12.1
       hooks:
           - id: black
     - repo: https://github.com/jazzband/pip-tools
@@ -46,7 +46,7 @@ repos:
           - id: validate-pyproject
 
     - repo: https://github.com/adrienverge/yamllint.git
-      rev: v1.32.0
+      rev: v1.33.0
       hooks:
           - id: yamllint
 
