@@ -15,7 +15,9 @@ cfgv==3.3.1
 charset-normalizer==3.1.0
     # via requests
 cryptography==41.0.5
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   secretstorage
 distlib==0.3.6
     # via virtualenv
 django==4.2.1
@@ -30,34 +32,77 @@ django-stubs==4.2.0
     # via -r requirements.in
 django-stubs-ext==4.2.0
     # via django-stubs
+docutils==0.20.1
+    # via readme-renderer
 filelock==3.12.0
     # via virtualenv
 identify==2.5.24
     # via pre-commit
 idna==3.4
     # via requests
+importlib-metadata==7.0.1
+    # via
+    #   keyring
+    #   twine
+jaraco-classes==3.3.0
+    # via keyring
+jeepney==0.8.0
+    # via
+    #   keyring
+    #   secretstorage
+keyring==24.3.0
+    # via twine
+markdown-it-py==3.0.0
+    # via rich
+mdurl==0.1.2
+    # via markdown-it-py
+more-itertools==10.2.0
+    # via jaraco-classes
 mypy==1.3.0
     # via
     #   -r requirements.in
     #   django-stubs
 mypy-extensions==1.0.0
     # via mypy
+nh3==0.2.15
+    # via readme-renderer
 nodeenv==1.8.0
     # via pre-commit
+pkginfo==1.9.6
+    # via twine
 platformdirs==3.5.1
     # via virtualenv
 pre-commit==3.3.2
     # via -r requirements.in
 pycparser==2.21
     # via cffi
+pygments==2.17.2
+    # via
+    #   readme-renderer
+    #   rich
 pyjwt==2.8.0
     # via -r requirements.in
 pyyaml==6.0.1
     # via pre-commit
+readme-renderer==42.0
+    # via twine
 requests==2.31.0
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   requests-toolbelt
+    #   twine
+requests-toolbelt==1.0.0
+    # via twine
+rfc3986==2.0.0
+    # via twine
+rich==13.7.0
+    # via twine
+secretstorage==3.3.3
+    # via keyring
 sqlparse==0.4.4
     # via django
+twine==4.0.2
+    # via -r requirements.in
 types-pytz==2023.3.0.0
     # via django-stubs
 types-pyyaml==6.0.12.10
@@ -72,9 +117,13 @@ typing-extensions==4.6.3
     #   django-stubs-ext
     #   mypy
 urllib3==2.0.3
-    # via requests
+    # via
+    #   requests
+    #   twine
 virtualenv==20.23.0
     # via pre-commit
+zipp==3.17.0
+    # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

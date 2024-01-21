@@ -19,7 +19,7 @@ repos:
       hooks:
           - id: black
     - repo: https://github.com/jazzband/pip-tools
-      rev: 6.13.0
+      rev: 7.3.0
       hooks:
           - id: pip-compile
             args:
@@ -34,6 +34,10 @@ repos:
                 - json
                 - yaml
                 - toml
+    - repo: https://github.com/stephen-ra-king/piptools-sync
+      rev: v1.0.4
+      hooks:
+          - id: piptools_sync
 
     # Linters
     - repo: https://github.com/abravalheri/validate-pyproject
@@ -50,7 +54,9 @@ repos:
     - repo: local
       hooks:
           - id: gitignore
-            entry: curl -so .gitignore https://raw.githubusercontent.com/github/gitignore/main/Python.gitignore
+            entry: |
+                curl -so .gitignore
+                https://raw.githubusercontent.com/github/gitignore/main/Python.gitignore
             language: system
             name: gitignore
             pass_filenames: false

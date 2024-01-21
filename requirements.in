@@ -10,5 +10,6 @@ django-stubs
 mypy
 pre-commit
 types-requests
+twine
 
 # pip-tools and wheel will be installed by Dockerfile
