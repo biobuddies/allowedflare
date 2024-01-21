@@ -15,7 +15,9 @@ cfgv==3.3.1
 charset-normalizer==3.1.0
     # via requests
 cryptography==41.0.5
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   secretstorage
 distlib==0.3.6
     # via virtualenv
 django==4.2.1
@@ -44,6 +46,10 @@ importlib-metadata==7.0.1
     #   twine
 jaraco-classes==3.3.0
     # via keyring
+jeepney==0.8.0
+    # via
+    #   keyring
+    #   secretstorage
 keyring==24.3.0
     # via twine
 markdown-it-py==3.0.0
@@ -91,6 +97,8 @@ rfc3986==2.0.0
     # via twine
 rich==13.7.0
     # via twine
+secretstorage==3.3.3
+    # via keyring
 sqlparse==0.4.4
     # via django
 twine==4.0.2
