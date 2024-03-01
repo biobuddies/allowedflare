@@ -1,17 +1,17 @@
 import logging
-from datetime import datetime, timedelta, timezone as datetime_timezone
+from datetime import datetime, timedelta
+from datetime import timezone as datetime_timezone
 from typing import Any
 
+import requests
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
+from django.conf import settings
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import User
 from django.http import HttpRequest
 from django.utils import timezone as django_utils_timezone
-from django.conf import settings
+from jwt import InvalidSignatureError, decode
 from jwt.algorithms import RSAAlgorithm
-from jwt import decode, InvalidSignatureError
-import requests
-
 
 cache_updated = datetime.fromtimestamp(0, tz=datetime_timezone.utc)
 cached_keys: list[RSAPublicKey] = []
@@ -19,15 +19,18 @@ logger = logging.getLogger(__name__)
 
 
 def clean_username(username: str) -> str:
-    return username.removesuffix(f'@{settings.ALLOWEDFLARE_PRIVATE_DOMAIN}')
+    suffix = getattr(settings, 'ALLOWEDFLARE_EMAIL_DOMAIN', settings.ALLOWEDFLARE_PRIVATE_DOMAIN)
+    return username.removesuffix(f'@{suffix}')
 
 
 def fetch_or_reuse_keys() -> list[RSAPublicKey]:
-    global cache_updated, cached_keys
+    global cache_updated, cached_keys  # noqa: PLW0603
     now = django_utils_timezone.now()
     # As of June 2023, signing keys are documented as rotated every 6 weeks
     if cache_updated + timedelta(days=1) < now:
-        response = requests.get(f'{settings.ALLOWEDFLARE_ACCESS_URL}/cdn-cgi/access/certs').json()
+        response = requests.get(
+            f'{settings.ALLOWEDFLARE_ACCESS_URL}/cdn-cgi/access/certs', timeout=3
+        ).json()
         if response.get('keys'):
             decoded_keys = [RSAAlgorithm.from_jwk(key) for key in response['keys']]
             cached_keys = [key for key in decoded_keys if isinstance(key, RSAPublicKey)]
@@ -50,7 +53,7 @@ def decode_token(cf_authorization: str) -> dict:
 
 
 def defaults_for_user(token: dict) -> dict:
-    return getattr(settings, 'ALLOWEDFLARE_DEFAULTS_FOR_USER', lambda token: {'is_staff': True})(
+    return getattr(settings, 'ALLOWEDFLARE_DEFAULTS_FOR_USER', lambda _token: {'is_staff': True})(
         token
     )
 
