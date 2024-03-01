@@ -4,7 +4,7 @@ default_language_version:
 repos:
     # Autoformatters
     - repo: https://github.com/astral-sh/ruff-pre-commit
-      rev: v0.1.14
+      rev: v0.3.0
       hooks:
           - id: ruff
             args:

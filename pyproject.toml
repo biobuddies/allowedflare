@@ -27,11 +27,23 @@ line-length = 100
 skip-magic-trailing-comma = true
 skip-string-normalization = true
 
+[tool.ruff.format]
+quote-style = 'single'
+skip-magic-trailing-comma = true
+
+[tool.ruff.lint.flake8-quotes]
+inline-quotes = 'single'
+
 [tool.django-stubs]
 django_settings_module = 'demodj.settings'
 
 [tool.ruff]
 line-length = 100
+
+[tool.ruff.lint]
+ignore = [
+    'EM101', # Allow exceptions to use string literals because keeping code as simple as possible is more important than keeping tracebacks as simple as possible.
+]
 
 [tool.mypy]
 plugins = ['mypy_django_plugin.main']
