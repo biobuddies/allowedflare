@@ -24,7 +24,7 @@ SECRET_KEY = getenv(
     'DEMODJ_SECRET_KEY', 'django-insecure-+u()*ykdn+20wd88=-ou3)c7#h)-psb5w80)z=jr&&&wr)9)0z'
 )
 if ALLOWEDFLARE_PRIVATE_DOMAIN:
-    ALLOWED_HOSTS = (f'.{ALLOWEDFLARE_PRIVATE_DOMAIN}',)
+    ALLOWED_HOSTS = (f'.{ALLOWEDFLARE_PRIVATE_DOMAIN}', 'localhost')
     CSRF_TRUSTED_ORIGINS = (f'https://*.{ALLOWEDFLARE_PRIVATE_DOMAIN}',)
 
 # "When DEBUG is True and ALLOWED_HOSTS is empty, the host is validated against
@@ -61,9 +61,9 @@ AUTHENTICATION_BACKENDS = [
 ROOT_URLCONF = 'demodj.urls'
 
 TEMPLATES = [
-    {
+    {  # To avoid admin.E403, configure Django templates
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['django_allowedflare'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

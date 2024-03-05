@@ -7,8 +7,10 @@ import requests
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
 from django.conf import settings
 from django.contrib.auth.backends import ModelBackend
-from django.contrib.auth.models import User
-from django.http import HttpRequest
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.models import User, Group, Permission
+from django.contrib.auth.views import LoginView
+from django.http import HttpRequest, HttpResponse
 from django.utils import timezone as django_utils_timezone
 from jwt import InvalidSignatureError, decode
 from jwt.algorithms import RSAAlgorithm
@@ -19,6 +21,11 @@ logger = logging.getLogger(__name__)
 
 
 def clean_username(username: str) -> str:
+    """
+    Remove @{suffix} from username, where suffix is settings.ALLOWEDFLARE_EMAIL_DOMAIN or if that's
+    not set settings.ALLOWEDFLARE_PRIVATE_DOMAIN. Set ALLOWEDFLARE_EMAIL_DOMAIN=off leave username
+    unmodified.
+    """
     suffix = getattr(settings, 'ALLOWEDFLARE_EMAIL_DOMAIN', settings.ALLOWEDFLARE_PRIVATE_DOMAIN)
     return username.removesuffix(f'@{suffix}')
 
@@ -32,9 +39,14 @@ def fetch_or_reuse_keys() -> list[RSAPublicKey]:
             f'{settings.ALLOWEDFLARE_ACCESS_URL}/cdn-cgi/access/certs', timeout=3
         ).json()
         if response.get('keys'):
-            decoded_keys = [RSAAlgorithm.from_jwk(key) for key in response['keys']]
-            cached_keys = [key for key in decoded_keys if isinstance(key, RSAPublicKey)]
-            cache_updated = now
+            rsa_public_keys = []
+            for key in response['keys']:
+                decoded_key = RSAAlgorithm.from_jwk(key)
+                if isinstance(decoded_key, RSAPublicKey):
+                    rsa_public_keys.append(decoded_key)
+            if rsa_public_keys:
+                cached_keys = rsa_public_keys
+                cache_updated = now
     return cached_keys
 
 
@@ -52,10 +64,36 @@ def decode_token(cf_authorization: str) -> dict:
     return {}
 
 
-def defaults_for_user(token: dict) -> dict:
-    return getattr(settings, 'ALLOWEDFLARE_DEFAULTS_FOR_USER', lambda _token: {'is_staff': True})(
-        token
-    )
+def update_user(user: User, token: dict):
+    user.is_active = True
+    user.is_staff = True
+    everyone, _ = Group.objects.get_or_create(name='allowedflare_everyone')
+    everyone.permissions.add(*Permission.objects.filter(codename__startswith='view'))
+    user.groups.add(everyone)
+
+
+def authenticate(request: HttpRequest | None) -> tuple[str, str, dict]:
+    """
+    Return a tuple with suffix-trimmed username, failure/success message, and decoded token.
+
+    On failure to authenticate, the username will be the empty string `''` and the token will be the
+    empty dictionary `{}`.
+    """
+    if settings.ALLOWEDFLARE_ACCESS_URL == 'off':
+        return ('', 'Allowedflare is off', {})
+
+    if not request or 'CF_Authorization' not in request.COOKIES:
+        return ('', 'Allowedflare could not find CF_Authorization cookie', {})
+    cookie = request.COOKIES['CF_Authorization']
+    token = decode_token(cookie)
+    if not token:
+        return ('', f'Allowedflare found invalid CF_Authorization cookie {cookie}', {})
+    if 'email' not in token:
+        return ('', f'Allowedflare could not find email within otherwise valid token {token}', {})
+
+    cleaned_username = clean_username(token['email'])
+    status = 'existing' if User.objects.filter(username=cleaned_username).exists() else 'new'
+    return (cleaned_username, f'Allowedflare authenticated {status} user {cleaned_username}', token)
 
 
 class Allowedflare(ModelBackend):
@@ -66,26 +104,15 @@ class Allowedflare(ModelBackend):
         password: str | None = None,
         **kwargs: Any,
     ) -> User | None:
-        if not request or 'CF_Authorization' not in request.COOKIES:
-            logger.warning('CF_Authorization cookie missing')
+        username_from_token, message, token = authenticate(request)
+        # Require an explicit username so that someone with a valid token can still log in to other
+        # accounts using ModelBackend or other authentication backends.
+        if username != username_from_token:
             return None
-        token = decode_token(request.COOKIES['CF_Authorization'])
-        if not token:
-            logger.warning(f'Invalid CF_Authorization cookie {request.COOKIES["CF_Authorization"]}')
-            return None
-        if 'email' not in token:
-            logger.warning(f'Valid token missing email {token}')
-
-        user, new = User.objects.update_or_create(
-            username=clean_username(token['email']),
-            email=token['email'],
-            defaults=defaults_for_user(token),
+        user, _ = User.objects.update_or_create(
+            username=username, defaults={'email': token['email']}
         )
-
-        if new:
-            logger.info(f'New user {user.email} authenticated with Allowedflare')
-        else:
-            logger.info(f'Existing user {user.email} authenticated with Allowedflare')
+        getattr(settings, 'ALLOWEDFLARE_UPDATE_USER', update_user)(user, token)
         return user
 
     def get_user(self, user_id: int) -> User | None:
@@ -93,3 +120,20 @@ class Allowedflare(ModelBackend):
             return User.objects.get(pk=user_id)
         except User.DoesNotExist:
             return None
+
+
+class AllowedflareLoginView(LoginView):
+    template_name = 'login.html'
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        self.username, message, _ = authenticate(self.request)
+        self.extra_context = {'allowedflare_message': message}
+        return super().get(request, *args, **kwargs)
+
+    def get_form(self, form_class: type[AuthenticationForm] | None = None) -> AuthenticationForm:
+        form = super().get_form(form_class)
+        if getattr(self, 'username', False):
+            form.fields['password'].initial = 'placeholder'
+            form.fields['password'].widget.render_value = True
+            form.fields['username'].initial = self.username
+        return form
