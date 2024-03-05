@@ -1,6 +1,9 @@
 ---
 version: '3.9'
 services:
+    proxy:
+        image: cloudflare/cloudflared:2024.2.1
+
     postgres:
         image: postgres:15
         command: postgres -p 5501
