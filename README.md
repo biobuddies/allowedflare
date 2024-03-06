@@ -16,7 +16,8 @@ Configure Cloudflare Tunnel public hostname demodj.your-domain.tld to http://loc
 
 ### TODO
 * Django REST Framework (DRF) support
-* (Re-) authenticating proxy for different-domain front-ends, like https://developers.cloudflare.com/cloudflare-one/identity/authorization-cookie/cors/#send-authentication-token-with-cloudflare-worker but
+* Same-origin (re-)authenticating proxy
+    - Like https://developers.cloudflare.com/cloudflare-one/identity/authorization-cookie/cors/#send-authentication-token-with-cloudflare-worker
     - Setting username so it can be logged by gunicorn
     - Rewriting origin redirects
     - Setting the XmlHttpRequest(?) header to avoid redirects to the sign-in page
@@ -24,3 +25,8 @@ Configure Cloudflare Tunnel public hostname demodj.your-domain.tld to http://loc
 * Unit tests
 * Example configuration using Helicopyter
 * End-to-end tests
+
+## Open Questions
+* Should Allowedflare provide a subclass of
+  [RemoteUserMiddleware](https://docs.djangoproject.com/en/5.0/howto/auth-remote-user/)
+  to automatically login each request?

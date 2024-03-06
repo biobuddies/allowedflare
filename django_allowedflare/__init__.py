@@ -22,12 +22,29 @@ logger = logging.getLogger(__name__)
 
 def clean_username(username: str) -> str:
     """
-    Remove @{suffix} from username, where suffix is settings.ALLOWEDFLARE_EMAIL_DOMAIN or if that's
-    not set settings.ALLOWEDFLARE_PRIVATE_DOMAIN. Set ALLOWEDFLARE_EMAIL_DOMAIN=off leave username
-    unmodified.
+    Remove @{suffix} from username, where suffix is `settings.ALLOWEDFLARE_EMAIL_DOMAIN` or
+    `settings.ALLOWEDFLARE_PRIVATE_DOMAIN`. Set `ALLOWEDFLARE_EMAIL_DOMAIN=off` to leave the
+    username unmodified.
+
+    Compared to `RemoteUserBackend.clean_username()`, the `self` argument is omitted to make
+    user-provided replacement easier.
     """
     suffix = getattr(settings, 'ALLOWEDFLARE_EMAIL_DOMAIN', settings.ALLOWEDFLARE_PRIVATE_DOMAIN)
     return username.removesuffix(f'@{suffix}')
+
+
+def configure_user(user: User, request: HttpRequest, created: bool) -> User:
+    """
+    Ensure the user can view all models through the admin site.
+
+    To match `RemoteUserBackend.configure_user()`, `request` and `created` arguments are accepted
+    but unused. The `self` argument is omitted to make user-provided replacement easier.
+    """
+    user.is_staff = True
+    everyone, _ = Group.objects.get_or_create(name='allowedflare_everyone')
+    everyone.permissions.add(*Permission.objects.filter(codename__startswith='view'))
+    user.groups.add(everyone)
+    return user
 
 
 def fetch_or_reuse_keys() -> list[RSAPublicKey]:
@@ -64,15 +81,7 @@ def decode_token(cf_authorization: str) -> dict:
     return {}
 
 
-def update_user(user: User, token: dict):
-    user.is_active = True
-    user.is_staff = True
-    everyone, _ = Group.objects.get_or_create(name='allowedflare_everyone')
-    everyone.permissions.add(*Permission.objects.filter(codename__startswith='view'))
-    user.groups.add(everyone)
-
-
-def authenticate(request: HttpRequest | None) -> tuple[str, str, dict]:
+def authenticate(request: HttpRequest) -> tuple[str, str, dict]:
     """
     Return a tuple with suffix-trimmed username, failure/success message, and decoded token.
 
@@ -82,7 +91,7 @@ def authenticate(request: HttpRequest | None) -> tuple[str, str, dict]:
     if settings.ALLOWEDFLARE_ACCESS_URL == 'off':
         return ('', 'Allowedflare is off', {})
 
-    if not request or 'CF_Authorization' not in request.COOKIES:
+    if 'CF_Authorization' not in request.COOKIES:
         return ('', 'Allowedflare could not find CF_Authorization cookie', {})
     cookie = request.COOKIES['CF_Authorization']
     token = decode_token(cookie)
@@ -104,15 +113,24 @@ class Allowedflare(ModelBackend):
         password: str | None = None,
         **kwargs: Any,
     ) -> User | None:
+        if not request:
+            return None
         username_from_token, message, token = authenticate(request)
+        if not username_from_token:
+            logger.info(message)
+            return None
         # Require an explicit username so that someone with a valid token can still log in to other
         # accounts using ModelBackend or other authentication backends.
         if username != username_from_token:
+            logger.info(
+                f'Allowedflare found {username} != {username_from_token} (ignoring {message})'
+            )
             return None
-        user, _ = User.objects.update_or_create(
+        logger.info(message)
+        user, created = User.objects.update_or_create(
             username=username, defaults={'email': token['email']}
         )
-        getattr(settings, 'ALLOWEDFLARE_UPDATE_USER', update_user)(user, token)
+        getattr(settings, 'ALLOWEDFLARE_CONFIGURE_USER', configure_user)(user, request, created)
         return user
 
     def get_user(self, user_id: int) -> User | None:
