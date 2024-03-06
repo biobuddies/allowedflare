@@ -22,11 +22,6 @@ readme = 'README.md'
 [project.urls]
 Homepage = 'https://github.com/covracer/allowedflare'
 
-[tool.black]
-line-length = 100
-skip-magic-trailing-comma = true
-skip-string-normalization = true
-
 [tool.ruff.format]
 quote-style = 'single'
 skip-magic-trailing-comma = true
