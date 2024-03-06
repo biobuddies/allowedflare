@@ -2,11 +2,14 @@
 cryptography
 django
 django-extensions
+django-health-check
+djangorestframework
 pyjwt
 requests
 
 # Development tools, build-time dependencies
 django-stubs
+djangorestframework-stubs[compatible-mypy]
 mypy
 pre-commit
 types-requests

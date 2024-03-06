@@ -12,7 +12,8 @@ from django.contrib.auth.models import User, Group, Permission
 from django.contrib.auth.views import LoginView
 from django.http import HttpRequest, HttpResponse
 from django.utils import timezone as django_utils_timezone
-from jwt import InvalidSignatureError, decode
+from rest_framework.authentication import BaseAuthentication
+from jwt import DecodeError, InvalidSignatureError, decode
 from jwt.algorithms import RSAAlgorithm
 
 cache_updated = datetime.fromtimestamp(0, tz=datetime_timezone.utc)
@@ -76,7 +77,7 @@ def decode_token(cf_authorization: str) -> dict:
                 audience=settings.ALLOWEDFLARE_AUDIENCE,
                 algorithms=['RS256'],
             )
-        except InvalidSignatureError:
+        except (DecodeError, InvalidSignatureError):
             pass
     return {}
 
@@ -105,6 +106,14 @@ def authenticate(request: HttpRequest) -> tuple[str, str, dict]:
     return (cleaned_username, f'Allowedflare authenticated {status} user {cleaned_username}', token)
 
 
+def update_or_create_user(username: str, request: HttpRequest, token: dict) -> User:
+    user, created = User.objects.update_or_create(
+        username=username, defaults={'email': token['email']}
+    )
+    getattr(settings, 'ALLOWEDFLARE_CONFIGURE_USER', configure_user)(user, request, created)
+    return user
+
+
 class Allowedflare(ModelBackend):
     def authenticate(
         self,
@@ -127,11 +136,7 @@ class Allowedflare(ModelBackend):
             )
             return None
         logger.info(message)
-        user, created = User.objects.update_or_create(
-            username=username, defaults={'email': token['email']}
-        )
-        getattr(settings, 'ALLOWEDFLARE_CONFIGURE_USER', configure_user)(user, request, created)
-        return user
+        return update_or_create_user(username, request, token)
 
     def get_user(self, user_id: int) -> User | None:
         try:
@@ -155,3 +160,12 @@ class AllowedflareLoginView(LoginView):
             form.fields['password'].widget.render_value = True
             form.fields['username'].initial = self.username
         return form
+
+
+class DRFAuthentication(BaseAuthentication):
+    def authenticate(self, request: HttpRequest) -> tuple[User | None, dict | None]:
+        username, message, token = authenticate(request)
+        logger.info(message)
+        if not username:
+            return (None, None)
+        return (update_or_create_user(username, request, token), token)

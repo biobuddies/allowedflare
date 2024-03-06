@@ -16,12 +16,21 @@ Including another URLconf
 """
 
 from django.contrib.admin import site
-from django.urls import path
+from django.urls import include, path
+from rest_framework import routers
 
 from django_allowedflare import AllowedflareLoginView
+from . import views
 
+router = routers.DefaultRouter()
+router.register(r'api/groups', views.GroupViewSet)
+router.register(r'api/users', views.UserViewSet)
 
 urlpatterns = [
     path('admin/login/', AllowedflareLoginView.as_view(), name='admin-login'),
     path('admin/', site.urls),
+    path('health/', include('health_check.urls')),
+    path('api/', include(router.urls)),
 ]
+
+urlpatterns += router.urls

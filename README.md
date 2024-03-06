@@ -15,7 +15,6 @@ docker compose up
 Configure Cloudflare Tunnel public hostname demodj.your-domain.tld to http://localhost:8001 or equivalent.
 
 ### TODO
-* Django REST Framework (DRF) support
 * Same-origin (re-)authenticating proxy
     - Like https://developers.cloudflare.com/cloudflare-one/identity/authorization-cookie/cors/#send-authentication-token-with-cloudflare-worker
     - Setting username so it can be logged by gunicorn
@@ -27,6 +26,11 @@ Configure Cloudflare Tunnel public hostname demodj.your-domain.tld to http://loc
 * End-to-end tests
 
 ## Open Questions
+* Do existing projects like
+  https://django-rest-framework-simplejwt.readthedocs.io/en/latest/index.html
+  already provide this functionality?
 * Should Allowedflare provide a subclass of
   [RemoteUserMiddleware](https://docs.djangoproject.com/en/5.0/howto/auth-remote-user/)
   to automatically login each request?
+* Are there Free/Libre/Open Source alternatives to Cloudflare Access and Okta that I can run
+  end-to-end tests against?
