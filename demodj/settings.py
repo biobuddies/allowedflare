@@ -137,3 +137,7 @@ LOGGING = {
     'handlers': {'console': {'class': 'logging.StreamHandler'}},
     'root': {'handlers': ['console'], 'level': LOG_LEVEL},
 }
+
+SHELL_PLUS = 'lab'
+SHELL_PLUS_PRINT_SQL = True
+SHELL_PLUS_PRINT_SQL_TRUNCATE = 5000

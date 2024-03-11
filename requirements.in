@@ -4,6 +4,7 @@ django
 django-extensions
 django-health-check
 djangorestframework
+jupyterlab
 pyjwt
 requests
 
