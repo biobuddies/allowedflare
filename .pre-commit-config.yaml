@@ -1,51 +1,19 @@
 default_language_version:
-    python: python3.11 # Using .python-version would be nice
+    python: python3.12 # Using .python-version would be nice
 repos:
-    # Autoformatters
-    - repo: https://github.com/astral-sh/ruff-pre-commit
-      rev: v0.3.0
+    - repo: https://github.com/biobuddies/helicopyter
+      rev: v2024.15.0
       hooks:
+          - id: dot-yaml
+          - id: mypy
           - id: ruff
             args:
                 - --fix
           - id: ruff-format
-    - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: v4.5.0
-      hooks:
-          - id: end-of-file-fixer
-    - repo: https://github.com/jazzband/pip-tools
-      rev: 7.3.0
-      hooks:
-          - id: pip-compile
-            args:
-                - --no-emit-index-url
-            stages:
-                - manual
-    - repo: https://github.com/pre-commit/mirrors-prettier
-      rev: v2.7.1
-      hooks:
-          - id: prettier
-            types_or:
-                - json
-                - yaml
-                - toml
-    - repo: https://github.com/stephen-ra-king/piptools-sync
-      rev: v1.0.4
-      hooks:
-          - id: piptools_sync
-
-    # Linters
-    - repo: https://github.com/abravalheri/validate-pyproject
-      rev: v0.15
-      hooks:
-          - id: validate-pyproject
-
-    - repo: https://github.com/adrienverge/yamllint.git
-      rev: v1.33.0
-      hooks:
+          - id: shellcheck
+          - id: uv-pip-compile
           - id: yamllint
-
-    # Outside of the box
+    # TODO add to helicopyter
     - repo: local
       hooks:
           - id: gitignore
@@ -56,23 +24,20 @@ repos:
             language: system
             name: gitignore
             pass_filenames: false
-          - id: mypy
-            entry: 'mypy .'
+          - id: prettier
+            entry: node_modules/.bin/prettier --write
             language: system
-            name: mypy
-            pass_filenames: false
-            stages:
-                - manual
-            types:
-                - python
-            verbose: true
-
-          - id: pip-check
-            entry: pip check
+            name: prettier
+            types_or:
+                - json
+                - yaml
+                - toml
+                - ts
+          - id: uv-pip-check
+            entry: uv pip check
             language: system
-            name: pip-check
+            name: uv-pip-check
             pass_filenames: false
-
           - id: shell-includes
             entry: curl -Os https://raw.githubusercontent.com/covracer/helicopyter/main/includes.sh
             language: system

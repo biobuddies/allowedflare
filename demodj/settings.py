@@ -13,20 +13,21 @@ from ast import literal_eval
 from os import getenv
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-# Use a real secret key and set DEBUG to False in production
 ALLOWEDFLARE_ACCESS_URL = getenv('ALLOWEDFLARE_ACCESS_URL', 'off')
 ALLOWEDFLARE_AUDIENCE = getenv('ALLOWEDFLARE_AUDIENCE', '')
 ALLOWEDFLARE_PRIVATE_DOMAIN = getenv('ALLOWEDFLARE_PRIVATE_DOMAIN', '')
-DEBUG = bool(literal_eval(getenv('DEMODJ_DEBUG', 'True')))
-SECRET_KEY = getenv(
-    'DEMODJ_SECRET_KEY', 'django-insecure-+u()*ykdn+20wd88=-ou3)c7#h)-psb5w80)z=jr&&&wr)9)0z'
-)
+
 if ALLOWEDFLARE_PRIVATE_DOMAIN:
     ALLOWED_HOSTS = (f'.{ALLOWEDFLARE_PRIVATE_DOMAIN}', 'localhost')
     CSRF_TRUSTED_ORIGINS = (f'https://*.{ALLOWEDFLARE_PRIVATE_DOMAIN}',)
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Use a real secret key and set DEBUG to False in production
+DEBUG = bool(literal_eval(getenv('DEMODJ_DEBUG', 'True')))
+SECRET_KEY = getenv(
+    'DEMODJ_SECRET_KEY', 'django-insecure-+u()*ykdn+20wd88=-ou3)c7#h)-psb5w80)z=jr&&&wr)9)0z'
+)
 # "When DEBUG is True and ALLOWED_HOSTS is empty, the host is validated against
 # ['.localhost', '127.0.0.1', '[::1]']."
 # https://docs.djangoproject.com/en/4.2/ref/settings/#allowed-hosts
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+    'explorer',
     'health_check',
     'health_check.db',
     'health_check.contrib.migrations',
@@ -59,11 +61,11 @@ MIDDLEWARE = [
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'django_allowedflare.Allowedflare',
+    'django_allowedflare.AllowedflareBackend',
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': ('django_allowedflare.DRFAuthentication',),
+    'DEFAULT_AUTHENTICATION_CLASSES': ('django_allowedflare.AllowedflareAuthentication',),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',),
     'PAGE_SIZE': 10,
@@ -94,6 +96,9 @@ WSGI_APPLICATION = 'demodj.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {'default': {'ENGINE': 'django.db.backends.sqlite3', 'NAME': BASE_DIR / 'db.sqlite3'}}
+EXPLORER_CONNECTIONS = {'Demo DJ': 'default'}
+EXPLORER_DEFAULT_CONNECTION = 'default'
+EXPLORER_NO_PERMISSION_VIEW = 'django_allowedflare.login_view_wrapper'
 
 
 # Password validation

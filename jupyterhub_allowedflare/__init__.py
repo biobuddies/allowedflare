@@ -1,4 +1,4 @@
-from jupyterhub.auth import Authenticator
+from jupyterhub.auth import Authenticator  # type: ignore
 from tornado.web import RequestHandler
 
 from allowedflare import authenticate
@@ -6,6 +6,8 @@ from allowedflare import authenticate
 
 class JupyterHub(Authenticator):
     auto_login = True
+
+    # New configurable trait
 
     async def get_authenticated_user(self, handler: RequestHandler, data):
         username, message, token = authenticate(handler.request.cookies)

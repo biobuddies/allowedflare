@@ -1,6 +1,6 @@
 # Configuration file for jupyterhub.
 
-c = get_config()  # noqa
+c = get_config()  # type: ignore # noqa
 
 # ------------------------------------------------------------------------------
 # Application(SingletonConfigurable) configuration
@@ -292,7 +292,7 @@ c.JupyterHub.base_url = '/jupyter/'
 
 ## url for the database. e.g. `sqlite:///jupyterhub.sqlite`
 #  Default: 'sqlite:///jupyterhub.sqlite'
-# c.JupyterHub.db_url = 'sqlite:///jupyterhub.sqlite'
+c.JupyterHub.db_url = 'sqlite:///:memory:'
 
 ## log all database transactions. This has A LOT of output
 #  Default: False

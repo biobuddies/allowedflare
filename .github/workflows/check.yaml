@@ -1,0 +1,69 @@
+name: Check
+run-name: Checking on behalf of ${{ github.actor }}
+on: # yamllint disable-line rule:truthy
+    - pull_request
+jobs:
+    check:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - run: source includes.sh && ghas
+
+            - uses: actions/setup-node@v4
+              with:
+                  cache: yarn
+                  node-version-file: .nvmrc
+            - run: npm -g install yarn && yarn
+
+            - uses: actions/setup-python@v5
+              with:
+                  python-version-file: .python-version
+            - id: today
+              run: date -u +today=%Y-%m-%d >> $GITHUB_OUTPUT
+            - uses: actions/cache/restore@v4
+              id: restore-pip
+              with:
+                  key: |
+                      ${{ runner.os }}-pip
+                      ${{ steps.today.outputs.today }}
+                  path: ~/.cache/pip
+            - run: pip install --upgrade pip uv
+              env:
+                  PIP_PROGRESS_BAR: 'off'
+            - uses: actions/cache/save@v4
+              with:
+                  key: ${{ steps.restore-pip.outputs.cache-primary-key }}
+                  path: ~/.cache/pip
+            - uses: actions/cache/restore@v4
+              id: restore-uv
+              with:
+                  key: |
+                      ${{ runner.os }}-pip
+                      ${{ hashFiles('requirements.txt') }}
+                  path: ~/.cache/uv
+            - run: uv venv && uv pip sync requirements.txt
+            - uses: actions/cache/save@v4
+              with:
+                  key: ${{ steps.restore-uv.outputs.cache-primary-key }}
+                  path: ~/.cache/uv
+
+            - uses: actions/cache/restore@v4
+              id: restore-pre-commit
+              with:
+                  key: |
+                      ${{ runner.os }}-pre-commit
+                      ${{ hashFiles('.pre-commit-config.yaml') }}
+                  path: ~/.cache/pre-commit
+            - run: .venv/bin/pre-commit install-hooks
+            - uses: actions/cache/save@v4
+              with:
+                  key: ${{ steps.restore-pre-commit.outputs.cache-primary-key }}
+                  path: ~/.cache/pre-commit
+
+            - run: source includes.sh && a && pcam --color always --show-diff-on-failure
+            - run: .venv/bin/python -m build
+            - run: .venv/bin/twine check dist/*
+            - run: .venv/bin/python -m manage check
+            - run: .venv/bin/python -m manage makemigrations --check
+            - run: docker compose build
+            - run: docker compose run web pytest

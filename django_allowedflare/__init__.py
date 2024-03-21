@@ -2,11 +2,12 @@ import logging
 from typing import Any
 
 from django.conf import settings
+from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.auth.views import LoginView
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseBase
 from rest_framework.authentication import BaseAuthentication
 
 from allowedflare import authenticate
@@ -22,6 +23,8 @@ def configure_user(user: User, request: HttpRequest, created: bool) -> User:
     but unused. The `self` argument is omitted to make user-provided replacement easier.
     """
     user.is_staff = True
+    user.save()
+
     everyone, _ = Group.objects.get_or_create(name='allowedflare_everyone')
     everyone.permissions.add(*Permission.objects.filter(codename__startswith='view'))
     user.groups.add(everyone)
@@ -29,14 +32,16 @@ def configure_user(user: User, request: HttpRequest, created: bool) -> User:
 
 
 def update_or_create_user(username: str, request: HttpRequest, token: dict) -> User:
-    user, created = User.objects.update_or_create(
-        username=username, defaults={'email': token['email']}
-    )
+    if 'email' in token:
+        defaults = {'email': token['email']}
+    else:
+        defaults = {}
+    user, created = User.objects.update_or_create(username=username, defaults=defaults)
     getattr(settings, 'ALLOWEDFLARE_CONFIGURE_USER', configure_user)(user, request, created)
     return user
 
 
-class Allowedflare(ModelBackend):
+class AllowedflareBackend(ModelBackend):
     def authenticate(
         self,
         request: HttpRequest | None,
@@ -71,8 +76,8 @@ class AllowedflareLoginView(LoginView):
     template_name = 'login.html'
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        self.username, message, _ = authenticate(self.request)
-        self.extra_context = {'allowedflare_message': message}
+        self.username, message, _ = authenticate(self.request.COOKIES)
+        self.extra_context['allowedflare_message'] = message
         return super().get(request, *args, **kwargs)
 
     def get_form(self, form_class: type[AuthenticationForm] | None = None) -> AuthenticationForm:
@@ -84,9 +89,15 @@ class AllowedflareLoginView(LoginView):
         return form
 
 
-class DRFAuthentication(BaseAuthentication):
+def login_view_wrapper(request: HttpRequest) -> HttpResponseBase:
+    return AllowedflareLoginView.as_view(
+        extra_context={'title': 'Log In', REDIRECT_FIELD_NAME: request.get_full_path()}
+    )(request)
+
+
+class AllowedflareAuthentication(BaseAuthentication):
     def authenticate(self, request: HttpRequest) -> tuple[User | None, dict | None]:
-        username, message, token = authenticate(request)
+        username, message, token = authenticate(request.COOKIES)
         logger.info(message)
         if not username:
             return (None, None)

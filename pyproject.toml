@@ -10,11 +10,7 @@ classifiers = [
     'Topic :: Internet :: WWW/HTTP :: Session',
 ]
 description = 'Authenticate to Django with JSON Web Tokens (JWTs) signed by Cloudflare Access'
-dependencies = [
-    'cryptography',
-    'pyjwt',
-    'requests',
-]
+dependencies = ['cryptography', 'pyjwt', 'requests']
 dynamic = ['version']
 name = 'allowedflare'
 readme = 'README.md'
