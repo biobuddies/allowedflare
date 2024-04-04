@@ -39,6 +39,7 @@ demo = [
     'django-health-check',
     'django-sql-explorer',
     'djangorestframework',
+    'gunicorn',
     'jupyterlab',
 ]
 build = ['build', 'twine']

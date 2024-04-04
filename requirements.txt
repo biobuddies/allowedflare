@@ -129,6 +129,8 @@ filelock==3.18.0
     # via virtualenv
 fqdn==1.5.1
     # via jsonschema
+gunicorn==23.0.0
+    # via allowedflare (pyproject.toml)
 h11==0.14.0
     # via httpcore
 hadolint-py @ git+https://github.com/AleksaC/hadolint-py.git@a54e4d51787678062c8e108b20782f00e707a40e
@@ -299,6 +301,7 @@ overrides==7.7.0
 packaging==24.2
     # via
     #   build
+    #   gunicorn
     #   ipykernel
     #   jupyter-events
     #   jupyter-server
