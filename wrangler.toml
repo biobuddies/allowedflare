@@ -1,0 +1,4 @@
+name = 'allowedflare-proxy'
+main = 'allowedflare-proxy/index.ts'
+compatibility_date = '2024-03-08'
+workers_dev = false
