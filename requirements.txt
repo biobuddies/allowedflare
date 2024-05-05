@@ -252,8 +252,11 @@ pyjwt==2.8.0
 pyproject-hooks==1.1.0
     # via build
 pytest==8.2.0
-    # via pytest-django
+    # via
+    #   pytest-django
+    #   pytest-mock
 pytest-django==4.8.0
+pytest-mock==3.14.0
 python-dateutil==2.9.0.post0
     # via
     #   arrow

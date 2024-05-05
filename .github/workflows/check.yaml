@@ -38,7 +38,7 @@ jobs:
               id: restore-uv
               with:
                   key: |
-                      ${{ runner.os }}-pip
+                      ${{ runner.os }}-uv
                       ${{ hashFiles('requirements.txt') }}
                   path: ~/.cache/uv
             - run: uv venv && uv pip sync requirements.txt
