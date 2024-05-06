@@ -3,15 +3,24 @@ cryptography
 django
 django-extensions
 django-health-check
+django-sql-explorer
 djangorestframework
+jupyterlab
 pyjwt
 requests
 
 # Development tools, build-time dependencies
+build
 django-stubs
 djangorestframework-stubs[compatible-mypy]
 mypy
 pre-commit
+pytest
+pytest-django
+pytest-mock
+yamllint
+ruff
+shellcheck-py
 types-requests
 twine
 

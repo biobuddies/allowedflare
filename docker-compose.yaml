@@ -3,6 +3,20 @@ services:
     proxy:
         image: cloudflare/cloudflared:2024.2.1
 
+    # TODO reuse the same build for lab and web
+    lab:
+        build: .
+        command: python -m manage shell_plus --allow-root
+        depends_on:
+            - postgres
+        environment:
+            - ALLOWEDFLARE_ACCESS_URL
+            - ALLOWEDFLARE_AUDIENCE
+            - ALLOWEDFLARE_EMAIL_DOMAIN
+            - ALLOWEDFLARE_PRIVATE_DOMAIN
+        volumes:
+            - .:/srv
+
     postgres:
         image: postgres:15
         command: postgres -p 5501
@@ -21,6 +35,7 @@ services:
         environment:
             - ALLOWEDFLARE_ACCESS_URL
             - ALLOWEDFLARE_AUDIENCE
+            - ALLOWEDFLARE_EMAIL_DOMAIN
             - ALLOWEDFLARE_PRIVATE_DOMAIN
         ports:
             # Should match manage.py
