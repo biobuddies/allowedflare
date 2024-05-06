@@ -17,7 +17,6 @@ def test_clean_username_unmodified(monkeypatch):
 
 
 def test_clean_username_email_domain_removed(monkeypatch):
-    monkeypatch.setenv('ALLOWEDFLARE_PRIVATE_DOMAIN', 'domain.dev')
     monkeypatch.setenv('ALLOWEDFLARE_EMAIL_DOMAIN', 'domain.com')
 
     assert clean_username('user@domain.com') == 'user'
