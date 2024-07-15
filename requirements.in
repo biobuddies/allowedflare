@@ -23,5 +23,6 @@ ruff
 shellcheck-py
 types-requests
 twine
+uv
 
 # pip-tools and wheel will be installed by Dockerfile
