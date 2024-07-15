@@ -2,13 +2,11 @@ default_language_version:
     python: python3.12 # Using .python-version would be nice
 repos:
     - repo: https://github.com/biobuddies/helicopyter
-      rev: v2024.15.0
+      rev: v2024.27.2
       hooks:
           - id: dot-yaml
           - id: mypy
-          - id: ruff
-            args:
-                - --fix
+          - id: ruff-check-fix
           - id: ruff-format
           - id: shellcheck
           - id: uv-pip-compile

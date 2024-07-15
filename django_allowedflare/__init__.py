@@ -77,7 +77,7 @@ class AllowedflareLoginView(LoginView):
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         self.username, message, _ = authenticate(self.request.COOKIES)
-        self.extra_context['allowedflare_message'] = message
+        self.extra_context = {**(self.extra_context or {}), 'allowedflare_message': message}
         return super().get(request, *args, **kwargs)
 
     def get_form(self, form_class: type[AuthenticationForm] | None = None) -> AuthenticationForm:
