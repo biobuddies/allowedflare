@@ -71,3 +71,16 @@ def authenticate(cookies: Mapping[str, Morsel | str]) -> tuple[str, str, dict]:
 
     name = clean_username(unprocessed_name)
     return (name, f'Allowedflare authenticated {name}', token)
+
+
+# Django REST Framework authentication class
+from allowedflare.django import Authentication  # noqa: E402, F401
+
+# Django Admin authentication backend
+from allowedflare.django import Backend  # noqa: E402, F401
+
+# Django Admin login view
+from allowedflare.django import LoginView  # noqa: E402, F401
+
+# SQL Explorer login view wrapper
+from allowedflare.django import login_view_wrapper  # noqa: E402, F401
