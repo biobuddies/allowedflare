@@ -13,7 +13,7 @@ jobs:
               with:
                   cache: yarn
                   node-version-file: .nvmrc
-            - run: npm -g install yarn && yarn
+            - run: yarn install --frozen-lockfile
 
             - uses: actions/setup-python@v5
               with:
