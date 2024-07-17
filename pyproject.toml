@@ -40,6 +40,6 @@ ignore = [
 plugins = ['mypy_drf_plugin.main', 'mypy_django_plugin.main']
 
 [tool.setuptools]
-packages = ['django_allowedflare']
+packages = ['allowedflare']
 
 [tool.setuptools_scm]
