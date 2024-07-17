@@ -3,7 +3,8 @@ from cryptography.hazmat.primitives.asymmetric.rsa import generate_private_key
 from cryptography.hazmat.backends import default_backend
 from datetime import UTC, datetime
 
-from allowedflare import authenticate, clean_username
+from allowedflare import clean_username
+from allowedflare.allowedflare import authenticate
 
 
 def test_clean_username_unmodified(monkeypatch):
@@ -69,7 +70,7 @@ def test_authenticate_valid_token(mocker, monkeypatch):
     monkeypatch.setenv('ALLOWEDFLARE_ACCESS_URL', 'https://demo.cloudflareaccess.com')
     monkeypatch.setenv('ALLOWEDFLARE_AUDIENCE', 'audience')
     mock_get_signing_key_from_jwt = mocker.patch(
-        'allowedflare.PyJWKClient.get_signing_key_from_jwt', autospec=True
+        'allowedflare.allowedflare.PyJWKClient.get_signing_key_from_jwt', autospec=True
     )
     mock_get_signing_key_from_jwt.return_value.key = private_key.public_key()
 

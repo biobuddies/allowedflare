@@ -73,7 +73,7 @@ ROOT_URLCONF = 'demodj.urls'
 TEMPLATES = [
     {  # To avoid admin.E403, configure Django templates
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['allowedflare'],
+        'DIRS': ['django_allowedflare'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
