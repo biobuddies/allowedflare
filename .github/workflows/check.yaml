@@ -66,4 +66,5 @@ jobs:
             - run: .venv/bin/python -m manage check
             - run: .venv/bin/python -m manage makemigrations --check
             - run: docker compose build
-            - run: docker compose run web pytest
+            # Ideally this would come from default.settings_module()
+            - run: docker compose run web pytest --ds=demodj.settings
