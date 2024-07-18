@@ -59,13 +59,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    'django_allowedflare.AllowedflareBackend',
-]
+AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend', 'allowedflare.Backend']
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': ('django_allowedflare.AllowedflareAuthentication',),
+    'DEFAULT_AUTHENTICATION_CLASSES': ('allowedflare.Authentication',),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',),
     'PAGE_SIZE': 10,
@@ -98,7 +95,7 @@ WSGI_APPLICATION = 'demodj.wsgi.application'
 DATABASES = {'default': {'ENGINE': 'django.db.backends.sqlite3', 'NAME': BASE_DIR / 'db.sqlite3'}}
 EXPLORER_CONNECTIONS = {'Demo DJ': 'default'}
 EXPLORER_DEFAULT_CONNECTION = 'default'
-EXPLORER_NO_PERMISSION_VIEW = 'django_allowedflare.login_view_wrapper'
+EXPLORER_NO_PERMISSION_VIEW = 'allowedflare.login_view_wrapper'
 
 
 # Password validation

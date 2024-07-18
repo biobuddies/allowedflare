@@ -6,11 +6,15 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User, Group, Permission
-from django.contrib.auth.views import LoginView
-from django.http import HttpRequest, HttpResponse, HttpResponseBase
+from django.contrib.auth.views import LoginView as DjangoLoginView
+from django.http import HttpRequest, HttpResponse
+
+# Can be shortened to django.http.HttpResponseBase in 4.1 and newer
+# https://github.com/django/django/pull/15667/commits/7e003fa06a40c72f7f442876e1eb2611115df80c
+from django.http.response import HttpResponseBase
 from rest_framework.authentication import BaseAuthentication
 
-from allowedflare import authenticate
+from allowedflare.allowedflare import authenticate
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +45,7 @@ def update_or_create_user(username: str, request: HttpRequest, token: dict) -> U
     return user
 
 
-class AllowedflareBackend(ModelBackend):
+class Backend(ModelBackend):
     def authenticate(
         self,
         request: HttpRequest | None,
@@ -72,7 +76,7 @@ class AllowedflareBackend(ModelBackend):
             return None
 
 
-class AllowedflareLoginView(LoginView):
+class LoginView(DjangoLoginView):
     template_name = 'login.html'
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
@@ -90,12 +94,12 @@ class AllowedflareLoginView(LoginView):
 
 
 def login_view_wrapper(request: HttpRequest) -> HttpResponseBase:
-    return AllowedflareLoginView.as_view(
+    return LoginView.as_view(
         extra_context={'title': 'Log In', REDIRECT_FIELD_NAME: request.get_full_path()}
     )(request)
 
 
-class AllowedflareAuthentication(BaseAuthentication):
+class Authentication(BaseAuthentication):
     def authenticate(self, request: HttpRequest) -> tuple[User | None, dict | None]:
         username, message, token = authenticate(request.COOKIES)
         logger.info(message)

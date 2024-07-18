@@ -1,5 +1,6 @@
-exclude .*
 exclude *
+exclude .*
 exclude .github/workflows/*
+exclude allowedflare-proxy/*
 exclude demodj/*
 include pyproject.toml
