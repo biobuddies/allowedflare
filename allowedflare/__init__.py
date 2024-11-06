@@ -1,3 +1,5 @@
+# TODO Avoid "AppRegistryNotReady: Apps aren't loaded yet."
+
 from allowedflare.allowedflare import clean_username
 
 # Django REST Framework authentication class

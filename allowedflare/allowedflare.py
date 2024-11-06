@@ -1,6 +1,7 @@
 import logging
 from http.cookies import Morsel
 from os import environ, getenv
+from re import sub
 from typing import Mapping
 
 from jwt import InvalidTokenError, InvalidSignatureError, decode
@@ -11,15 +12,27 @@ logger = logging.getLogger(__name__)
 
 def clean_username(username: str) -> str:
     """
-    Remove @{suffix} from username, where suffix is `ALLOWEDFLARE_EMAIL_DOMAIN` or
-    `ALLOWEDFLARE_PRIVATE_DOMAIN`. Set `ALLOWEDFLARE_EMAIL_DOMAIN=off` to leave the
-    username unmodified.
+    Strip suffixes from the username.
+
+    If ALLOWEDFLARE_EMAIL_REGEX == 'off', return username unmodified.
+
+    If ALLOWEDFLARE_EMAIL_REGEX is set to any other value, perform regular expression substitution,
+    replacing the match with the empty string ''.
+
+    Otherwise, assuming it is set, perform a string suffix removal of
+    `@{ALLOWEDFLARE_PRIVATE_DOMAIN}`.
 
     Compared to `RemoteUserBackend.clean_username()`, the `self` argument is omitted to make
     user-provided replacement easier.
     """
-    suffix = getenv('ALLOWEDFLARE_EMAIL_DOMAIN', getenv('ALLOWEDFLARE_PRIVATE_DOMAIN', 'off'))
-    return username.removesuffix(f'@{suffix}')
+    expression = getenv('ALLOWEDFLARE_EMAIL_REGEX')
+    if expression != 'off':
+        if expression:
+            return sub(f'@{expression}', '', username)
+        suffix = getenv('ALLOWEDFLARE_PRIVATE_DOMAIN')
+        if suffix:
+            return username.removesuffix(f'@{suffix}')
+    return username
 
 
 def authenticate(cookies: Mapping[str, Morsel | str]) -> tuple[str, str, dict]:
