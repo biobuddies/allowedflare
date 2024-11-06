@@ -1079,7 +1079,7 @@ c.JupyterHub.db_url = 'sqlite:///:memory:'
 ## The URL the single-user server should connect to the Hub.
 #
 #  If the Hub URL set in your JupyterHub config is not reachable from spawned
-#  notebooks, you can set differnt URL by this config.
+#  notebooks, you can set different URL by this config.
 #
 #  Is None if you don't need to change the URL.
 #  Default: None
@@ -1456,7 +1456,7 @@ c.JupyterHub.db_url = 'sqlite:///:memory:'
 #
 #  This function is called after the user has passed all authentication checks
 #  and is ready to successfully authenticate. This function must return the
-#  authentication dict reguardless of changes to it.
+#  authentication dict regardless of changes to it.
 #
 #  This maybe a coroutine.
 #

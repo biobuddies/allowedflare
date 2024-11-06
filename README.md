@@ -3,7 +3,7 @@ Authenticate to Django with JSON Web Tokens (JWTs) signed by Cloudflare Access. 
 To run the demo, set the following environment variables:
 ```
 export ALLOWEDFLARE_ACCESS_URL=https://your-organization.cloudflareaccess.com
-export ALLOWEDFLARE_AUDIENCE=64-character hexidecimal string
+export ALLOWEDFLARE_AUDIENCE=64-character hexadecimal string
 export ALLOWEDFLARE_PRIVATE_DOMAIN=your-domain.tld
 ```
 

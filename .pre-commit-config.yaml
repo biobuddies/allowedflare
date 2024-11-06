@@ -1,43 +1,24 @@
-default_language_version:
-    python: python3.12 # Using .python-version would be nice
 repos:
     - repo: https://github.com/biobuddies/helicopyter
-      rev: v2024.27.2
+      rev: v2024.39.1
       hooks:
+          - id: codespell
+            args:
+                - --check-filenames
+                - --check-hidden
+                - --write-changes
           - id: dot-yaml
+          - id: gitignore-node-python
+          - id: includes-sh
+          - id: mailmap
           - id: mypy
+          - id: prettier-write
           - id: ruff-check-fix
           - id: ruff-format
           - id: shellcheck
           - id: uv-pip-compile
           - id: yamllint
-    # TODO add to helicopyter
-    - repo: local
-      hooks:
-          - id: gitignore
-            entry: >
-                bash -c 'langs={Node,Python};
-                curl -s https://raw.githubusercontent.com/github/gitignore/main/$langs.gitignore >
-                .gitignore'
-            language: system
-            name: gitignore
-            pass_filenames: false
-          - id: prettier
-            entry: node_modules/.bin/prettier --write
-            language: system
-            name: prettier
-            types_or:
-                - json
-                - yaml
-                - toml
-                - ts
-          - id: uv-pip-check
-            entry: uv pip check
-            language: system
-            name: uv-pip-check
-            pass_filenames: false
-          - id: shell-includes
-            entry: curl -Os https://raw.githubusercontent.com/covracer/helicopyter/main/includes.sh
-            language: system
-            name: shell-includes
-            pass_filenames: false
+exclude: |
+    (?x)^(
+        package-lock.json
+    )$

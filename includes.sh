@@ -31,19 +31,37 @@ case $OS in
         ;;
 esac
 
-if ! [[ -x $(command -v nvm) ]]; then
-    NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-    # shellcheck disable=SC1091
-    [[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh" || echo INFO: nvm missing
+# Accept any kind of installation, such as Homebrew
+if ! [[ $(command -v asdf) ]]; then
+    if [[ -f $HOME/code/asdf/asdf.sh ]]; then
+        # Automate git installation configuration
+        # shellcheck disable=SC1091
+        source "$HOME/code/asdf/asdf.sh" \
+            && source "$HOME/code/asdf/completions/asdf.bash"
+    else
+        # Recommend git installation
+        echo "Please run
+git clone https://github.com/asdf-vm/asdf.git ~/code/asdf"
+    fi
 fi
+
+CLICOLOR_FORCE=1 # For `tree`; might also color `ls` on FreeBSD and Darwin
+export CLICOLOR_FORCE
 
 # F: no-op for single page, R: color, X: keep text when exiting, i: case insensitive searching
 LESS='-FRXi'
 export LESS
 
+PACKAGES="bind9-host curl fping git less tmux tree"
+export PACKAGES
+
 # Aliases only work in interactive shells
 alias jq='jq --color-output'
 alias ls='ls --color=auto'
+
+# Function naming philosophy:
+# * Few characters (usually an abbreviation) if frequently typed
+# * Descriptive snake_case, just like PEP8, for everything else
 
 pathver() {
     : 'print PATH and VERsion; optionally assert version file matches'
@@ -51,7 +69,7 @@ pathver() {
     if [[ -z $source ]]; then
         source=$(type "$1")
     fi
-    actual_version=$("$1" --version | gsed -E "s/($1 )?//i")
+    actual_version=$("$1" --version 2>&1 | gsed -En 's/(.+ )?(v?[0-9]+\.[0-9]+\.[^ ]+).*/\2/p')
     echo "$source $actual_version"
     if [[ -f $2 ]]; then
         expected_version=$(cat "$2")
@@ -78,15 +96,17 @@ a() {
 
     cd "$directory" || return 1
 
-    [[ $(command -v conda) ]] && conda deactivate
-    might_be_file=$(command -v deactivate)
-    if [[ $might_be_file ]]; then
-        if [[ -f $might_be_file ]]; then
-            # pyenv-virtualenv wants this
-            # shellcheck disable=SC1091
-            source deactivate
-        else
-            deactivate
+    [[ $CONDA_PREFIX && $(command -v conda) ]] && conda deactivate
+    if [[ $VIRTUAL_ENV ]]; then
+        might_be_file=$(command -v deactivate)
+        if [[ $might_be_file ]]; then
+            if [[ -f $might_be_file ]]; then
+                # pyenv-virtualenv wants this
+                # shellcheck disable=SC1091
+                source deactivate
+            else
+                deactivate
+            fi
         fi
     fi
 
@@ -102,15 +122,26 @@ a() {
     fi
 
     if [[ -f .nvmrc ]]; then
-        nvm install &>/dev/null && nvm use &>/dev/null
         pathver node .nvmrc
     fi
+}
 
-    export PS1='\w$ '
+build_twine() {
+    : 'clean, BUILD, and upload python package with TWINE'
+    if [[ $(git describe --exact --tags) != v20* ]]; then
+        echo 'ERROR: Please tag in the gvcount or yucount format'
+        return 1
+    fi
+    if [[ $TWINE_USERNAME != '__token__' || -z $TWINE_PASSWORD ]]; then
+        echo 'ERROR: Please set TWINE_USERNAME=__token__ and TWINE_PASSWORD=...'
+        return 1
+    fi
+    [[ -d dist ]] || mkdir dist
+    rm -r dist && python -m build && twine upload dist/*
 }
 
 cona() {
-    : 'CodeNAme'
+    : 'print CodeNAme, a four letter acronym'
     if [[ $GITHUB_REPOSITORY ]]; then
         echo "${GITHUB_REPOSITORY##*/}"
     elif [[ $VIRTUAL_ENV ]]; then
@@ -141,23 +172,46 @@ dcb() {
     docker compose --progress=plain build "$@"
 }
 
+dcp() {
+    : 'Docker Compose Push'
+    docker compose push --quiet "$@"
+}
+
+dcr() {
+    : 'Docker Compose Run, respecting docker-compose.yaml port definitions'
+    docker compose run --quiet-pull --service-ports "$@"
+}
+
 dcs() {
     : 'Docker Compose Shell'
     docker compose run "$(cona)" bash "$@"
 }
 
-dcr() {
-    : 'Docker Compose Run'
-    docker compose run "$@"
+dcu() {
+    : 'Docker Compose Up'
+    docker compose up "$@"
 }
 
 devready() {
     : 'DEVelopment READYness check'
     [[ $0 == *bash ]] || echo 'ERROR: not running in BASH
 Testing multiple shells is a lot of work, and shellcheck does not support zsh.'
+
+    grep -qE 'legacy_version_file.*=.*yes' ~/.asdfrc 2>/dev/null \
+        || echo 'WARNING: legacy_version_file != yes
+Files like .python-version will be ignored'
+    local installed
+    installed=$(asdf plugin list 2>/dev/null)
+    [[ $installed == *nodejs* ]] \
+        || echo 'WARNING: nodejs plugin for asdf not added'
+    [[ $installed == *tenv* ]] \
+        || echo 'WARNING: tenv plugin for asdf not added'
+    [[ $installed == *uv* ]] \
+        || echo 'WARNING: uv plugin for asdf not added'
+
     [[ $(git config --global advice.skippedCherryPicks) == false ]] \
         || echo 'WARNING: git advice.skippedCherryPicks != false
-This reduces noise when pull requests are squashed on the server side.'
+This reduces noise when pull requests are squashed on the server side'
     [[ $(git config --global core.commentChar) == ';' ]] \
         || echo 'WARNING: git core.commentChar != ;
 This allows # hash character to be used for Markdown headers'
@@ -200,6 +254,15 @@ forceready() {
         return
     fi
 
+    grep -qE 'legacy_version_file.*=.*yes' ~/.asdfrc 2>/dev/null \
+        || echo 'legacy_version_file = yes' >>~/.asdfrc
+    local installed
+    installed=$(asdf plugin list 2>/dev/null)
+    [[ $installed == *nodejs* ]] || asdf plugin add nodejs
+    [[ $installed == *tenv* ]] \
+        || asdf plugin add tenv https://github.com/tofuutils/asdf-tenv
+    [[ $installed == *uv* ]] || asdf plugin add uv
+
     git config --global advice.skippedCherryPicks false
     git config --global core.commentChar ';'
     git config --global diff.colormoved zebra
@@ -219,9 +282,42 @@ forceready() {
     fi
 }
 
+envi() {
+    : 'print ENVIronment, a four letter acronym'
+    if [[ $ENVI ]]; then
+        echo "$ENVI"
+    elif [[ $GITHUB_ACTIONS ]]; then
+        echo github
+    else
+        echo local
+    fi
+}
+
+functions() {
+    : 'list FUNCTIONS defined by includes.sh'
+    gsed -En 's/^ *([^(]+)\(\) \{$/\1/; T; N; s/\n +: /\t\t/; p' "${BASH_SOURCE[0]}"
+    echo -e "\nRun \`type function_name\` to display details.\n"
+    echo Environment Variables
+    echo -e "INSH_TRACE\t\tSet to 'off' to skip \`set -x\`"
+    echo -e "INSH_NAME\t\tgit user.name"
+    echo -e "INSH_EMAIL\t\tgit user.email"
+    echo -e "INSH_RELEASE_PREFIX\tSet to '-%G.%V.' for ISO year and week. Default is '-%Y.%U.'"
+    echo -e "INSH_TF\t\t\tSet to 'tofu' where appropriate. Default is 'terraform'"
+}
+
 gash() {
-    : 'Git hASH'
+    : 'print Git hASH, a four letter acronym'
     git describe --abbrev=40 --always --dirty --match=-
+}
+
+gvcount() {
+    : '%G %V COUNT style version string; see also: yucount'
+    local gv
+    gv=$(date -u +v%G.%V.)
+    git fetch --tags
+    local count
+    count=$(git tag --list "$gv*" | gsed "s/$gv//" | sort -r | head -1)
+    echo "$gv$((${count:-0} + 1))"
 }
 
 hta() {
@@ -234,15 +330,15 @@ hta() {
         return 1
     fi
     shift 2
-    python -m helicopyter "$cona"
-    TF_WORKSPACE="$envi" terraform -chdir="deploys/$cona/terraform" apply "$@"
+    python -m helicopyter --format_with="${INSH_TF:-terraform}" "$cona" \
+        && TF_WORKSPACE="$envi" ${INSH_TF:-terraform} -chdir="deploys/$cona/terraform" apply "$@"
 }
 
 hti() {
     : 'Helper for Terraform Init'
     local cona="${1?:Please provide a code name as the first argument}"
     shift
-    terraform -chdir="deploys/$cona/terraform" init "$@"
+    ${INSH_TF:-terraform} -chdir="deploys/$cona/terraform" init "$@"
 }
 
 htp() {
@@ -255,8 +351,8 @@ htp() {
         return 1
     fi
     shift 2
-    python -m helicopyter "$cona"
-    TF_WORKSPACE="$envi" terraform -chdir="deploys/$cona/terraform" plan "$@"
+    python -m helicopyter --format_with="${INSH_TF:-terraform}" "$cona" \
+        && TF_WORKSPACE="$envi" ${INSH_TF:-terraform} -chdir="deploys/$cona/terraform" plan "$@"
 }
 
 pc() {
@@ -307,40 +403,75 @@ pctam() {
         "$@"
 }
 
-resourcerun() {
-    : 'RE-SOURCE this file and RUN the specified function with tracing enabled'
-    # shellcheck source=includes.sh
-    source "${BASH_SOURCE[0]}"
-    set -x
-    "$@"
-    set +x
+release() {
+    : 'create a github RELEASE, and optionally also run build and twine upload'
+    local prefix
+    prefix=$(date -u "+v${INSH_RELEASE_PREFIX:-%Y.%U.}")
+    git fetch --tags
+    local count
+    count=$(git tag --list "$prefix*" | gsed "s/$prefix//" | sort -r | head -1)
+    gh release create "$prefix$((${count:-0} + 1))" --generate-notes
+    git fetch --tags
+    [[ $* == build ]] && build_twine
 }
 
 summarize() {
-    : 'SUMMARIZE for github actions'
+    : 'SUMMARIZE environment by displaying four letter acronyms'
+    local CONA GASH TABR
+    CONA=$(cona)
+    ENVI=$(envi)
+    GASH=$(gash)
+    TABR=$(tabr)
     cat <<EOD | tee "${GITHUB_STEP_SUMMARY:-/dev/null}"
-| FLAN | Unabbrev.  | Value                                          |
-| ---- | ---------- | ---------------------------------------------- |
-| CONA | COdeNAme   | $(cona) |
-| GASH | Git hASH   | $(gash) |
-| TABR | TAg/BRanch | $(tabr) |
+| FLAN | Unabbrevia. | Value                                          |
+| ---- | ----------- | ---------------------------------------------- |
+| CONA | COdeNAme    | $CONA |
+| ENVI | ENVIronment | $ENVI |
+| GASH | Git hASH    | $GASH |
+| ROLE | ROLE        | $ROLE |
+| TABR | TAg/BRanch  | $TABR |
 EOD
+    if [[ $GITHUB_ENV ]]; then
+        echo -e "CONA=$CONA\nGASH=$GASH\nTABR=$TABR" >>"$GITHUB_ENV"
+    fi
 }
 
 # Backwards compatibility with GitHub Actions Summary abbreviation
 ghas() { summarize; }
 
 tabr() {
-    : 'TAg or BRanch or empty string'
+    : 'print TAg or BRanch or empty string, a four letter acronym'
     # GITHUB_HEAD_REF works for Pull Requests, GITHUB_REF_NAME for all the other triggers
     # https://stackoverflow.com/questions/58033366
-    echo "${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
-    # TODO how should people set this locally? `git describe --tags`?
+    # In contrast to the git metadata, the GitHub Actions environment variables are available before
+    # git checkout, and may be less ambiguous.
+    if [[ $GITHUB_HEAD_REF ]]; then
+        echo "$GITHUB_HEAD_REF"
+    elif [[ $GITHUB_REF_NAME ]]; then
+        echo "$GITHUB_REF_NAME"
+    else
+        local description
+        description=$(git describe --all --dirty --exact-match 2>/dev/null)
+        [[ $description == *-dirty ]] || echo "${description#*/}"
+    fi
+}
+
+upc() {
+    : 'Uv Pip Compile'
+    uv pip compile -o requirements.txt --python-platform linux requirements.in
+    if [[ $OS == Darwin ]]; then
+        local appnope
+        appnope=$(uv pip freeze | grep appnope)
+        [[ $appnope ]] && echo "$appnope" >requirements-macos.txt
+    fi
 }
 
 ups() {
-    : 'Uv Pip Sync'
-    uv pip sync requirements.txt "$@"
+    : 'Uv Pip Sync, with MacOS workaround for appnope'
+    # shellcheck disable=SC2046
+    uv pip sync "$@" requirements.txt $(
+        [[ $OS == Darwin && -f requirements-macos.txt ]] && echo requirements-macos.txt
+    )
 }
 
 uuid() {
@@ -349,15 +480,22 @@ uuid() {
 }
 
 yucount() {
-    : '%Y %U COUNT style version string'
+    : '%Y %U COUNT style version string; see also: gvcount'
     local yu
     yu=$(date -u +v%Y.%U.)
     git fetch --tags
     local count
     count=$(git tag --list "$yu*" | gsed "s/$yu//" | sort -r | head -1)
-    date -u "+v%Y.%U.$((${count:-0} + 1))"
+    echo "$yu$((${count:-0} + 1))"
 }
 
 if [[ $* ]]; then
-    "$@"
+    if [[ $INSH_TRACE == 'off' ]]; then
+        "$@"
+    else
+        (
+            set -x
+            "$@"
+        )
+    fi
 fi

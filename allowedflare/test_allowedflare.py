@@ -8,19 +8,25 @@ from allowedflare.allowedflare import authenticate
 
 
 def test_clean_username_unmodified(monkeypatch):
-    monkeypatch.delenv('ALLOWEDFLARE_EMAIL_DOMAIN', raising=False)
+    monkeypatch.delenv('ALLOWEDFLARE_EMAIL_REGEX', raising=False)
     monkeypatch.delenv('ALLOWEDFLARE_PRIVATE_DOMAIN', raising=False)
     assert clean_username('user@domain.com') == 'user@domain.com'
 
-    monkeypatch.setenv('ALLOWEDFLARE_EMAIL_DOMAIN', 'off')
+    monkeypatch.setenv('ALLOWEDFLARE_EMAIL_REGEX', 'off')
     monkeypatch.setenv('ALLOWEDFLARE_PRIVATE_DOMAIN', 'domain.com')
     assert clean_username('user@domain.com') == 'user@domain.com'
 
 
 def test_clean_username_email_domain_removed(monkeypatch):
-    monkeypatch.setenv('ALLOWEDFLARE_EMAIL_DOMAIN', 'domain.com')
-
+    monkeypatch.setenv('ALLOWEDFLARE_EMAIL_REGEX', 'domain\.com')
     assert clean_username('user@domain.com') == 'user'
+
+
+def test_clean_username_regex(monkeypatch):
+    monkeypatch.setenv('ALLOWEDFLARE_EMAIL_REGEX', r'(domain\.com|domain\.org)')
+    assert clean_username('first.user@domain.com') == 'first.user'
+    assert clean_username('second.user@domain.net') == 'second.user@domain.net'
+    assert clean_username('third.user@domain.org') == 'third.user'
 
 
 def test_clean_username_private_domain_removed(monkeypatch):

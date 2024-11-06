@@ -41,6 +41,8 @@ cfgv==3.3.1
     # via pre-commit
 charset-normalizer==3.1.0
     # via requests
+codespell==2.3.0
+    # via -r requirements.in
 comm==0.2.1
     # via ipykernel
 cryptography==41.0.5
