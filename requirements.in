@@ -1,3 +1,11 @@
+# pre-commit
+codespell
+mypy
+ruff
+shellcheck-py
+uv
+yamllint
+
 # Run-time dependencies
 cryptography
 django
@@ -13,16 +21,9 @@ requests
 build
 django-stubs
 djangorestframework-stubs[compatible-mypy]
-mypy
 pre-commit
 pytest
 pytest-django
 pytest-mock
-yamllint
-ruff
-shellcheck-py
 types-requests
 twine
-uv
-
-# pip-tools and wheel will be installed by Dockerfile
