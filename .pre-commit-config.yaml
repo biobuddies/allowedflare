@@ -3,6 +3,10 @@ repos:
       rev: v2024.39.1
       hooks:
           - id: codespell
+            args:
+                - --check-filenames
+                - --check-hidden
+                - --write-changes
           - id: dot-yaml
           - id: gitignore-node-python
           - id: includes-sh
@@ -14,3 +18,7 @@ repos:
           - id: shellcheck
           - id: uv-pip-compile
           - id: yamllint
+exclude: |
+    (?x)^(
+        package-lock.json
+    )$
