@@ -5,7 +5,7 @@ FROM python:3.12
 WORKDIR /srv
 
 COPY includes.sh .
-# hadolint ignore=SC2086
+# hadolint ignore=DL3008,SC2086
 RUN --mount=type=cache,target=/var/cache/apt \
     rm /etc/apt/apt.conf.d/docker-clean \
     && echo 'Binary::apt::APT::Keep-Downloaded-Packages "1";' > /etc/apt/apt.conf.d/99cache \
@@ -21,7 +21,8 @@ RUN --mount=type=cache,target=/root/.npm \
 COPY requirements.txt .
 # hadolint ignore=DL3013,DL3042
 RUN --mount=type=cache,target=/root/.cache \
-    pip install --disable-pip-version-check --upgrade "$(grep ^uv requirements.txt)" \
+    pip install --disable-pip-version-check --progress-bar off --upgrade \
+        "$(grep ^uv requirements.txt)" \
     && uv venv \
     && uv pip sync requirements.txt
 

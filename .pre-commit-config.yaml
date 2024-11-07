@@ -19,6 +19,11 @@ repos:
           - id: ruff-format
           - id: shellcheck
           - id: uv-pip-compile
+            args:
+                - --all-extras
+                - --quiet
+                - pyproject.toml
+            files: pyproject.toml
           - id: yamllint
 exclude: |
     (?x)^(
