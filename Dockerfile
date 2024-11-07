@@ -18,13 +18,15 @@ COPY package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm \
     npm install --frozen-lockfile
 
+# Use a directory that's not volume-mounted
+ENV VIRTUAL_ENV=/venv
+ENV PATH="/venv/bin:$PATH"
 COPY requirements.txt ./
 # hadolint ignore=DL3013,DL3042
 RUN --mount=type=cache,target=/root/.cache \
-    uv venv /venv \
-    && /venv/bin/uv pip sync --quiet requirements.txt
+    uv venv \
+    && uv pip sync --quiet requirements.txt
 
-ENV PATH="/venv/bin:$PATH"
 
 RUN mkdir -p static
 
