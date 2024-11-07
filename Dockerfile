@@ -1,12 +1,13 @@
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
-# TODO assert C.UTF8 and PYTHONUNBUFFERED are set correctly
+# TODO assert C.UTF8 locale and PYTHONUNBUFFERED are set correctly
+ENV PYTHONUNBUFFERED 1
 
 WORKDIR /srv
 
-COPY includes.sh ./
 # hadolint ignore=DL3008,SC2046
 RUN --mount=type=cache,target=/var/cache/apt \
+    --mount=type=bind,source=includes.sh,target=includes.sh \
     rm /etc/apt/apt.conf.d/docker-clean \
     && echo 'Binary::apt::APT::Keep-Downloaded-Packages "1";' > /etc/apt/apt.conf.d/99cache \
     && apt-get update \
@@ -14,27 +15,26 @@ RUN --mount=type=cache,target=/var/cache/apt \
         $(sed -En 's/"$//; s/^PACKAGES="//p' includes.sh) \
     && rm -rf /var/lib/apt/lists/*
 
-COPY package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm \
+    --mount=type=bind,source=package.json,target=package.json \
+    --mount=type=bind,source=package-lock.json,target=package-lock.json \
     npm install --frozen-lockfile
 
-# Use a directory that's not volume-mounted
-ENV VIRTUAL_ENV=/venv
-ENV PATH="/venv/bin:$PATH"
-COPY requirements.txt ./
+# Not using /srv/.venv because it would make volume-mounting /srv harder
+ENV PATH="/root/venv/bin:$PATH"
+ENV UV_COMPILE_BYTECODE=1
+ENV UV_LINK_MODE=copy
+ENV UV_PROJECT_ENVIRONMENT=/root/venv
 # hadolint ignore=DL3013,DL3042
 RUN --mount=type=cache,target=/root/.cache \
+    --mount=type=bind,source=requirements.txt,target=requirements.txt \
     uv venv \
     && uv pip sync --quiet requirements.txt
-
-
-RUN mkdir -p static
 
 COPY . ./
 
 ARG STATIC_URL
 ENV STATIC_URL ${STATIC_URL:-/static/}
-RUN STATIC_URL=${STATIC_URL} python -m manage collectstatic --no-input
+RUN mkdir -p static && STATIC_URL=${STATIC_URL} python -m manage collectstatic --no-input
 
 EXPOSE 8001
-ENV PYTHONUNBUFFERED 1
