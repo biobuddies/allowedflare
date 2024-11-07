@@ -24,6 +24,8 @@ RUN --mount=type=cache,target=/root/.cache \
     pip install --disable-pip-version-check --progress-bar off --root-user-action ignore --upgrade \
         "$(grep ^uv requirements.txt)" \
     && uv venv \
+    && pwd \
+    && ls -a \
     && uv pip sync --quiet requirements.txt
 
 RUN mkdir -p static
