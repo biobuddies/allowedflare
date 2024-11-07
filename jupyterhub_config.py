@@ -175,7 +175,7 @@ c = get_config()  # type: ignore # noqa
 #    - null: jupyterhub.auth.NullAuthenticator
 #    - pam: jupyterhub.auth.PAMAuthenticator
 #  Default: 'jupyterhub.auth.PAMAuthenticator'
-c.JupyterHub.authenticator_class = 'jupyterhub_allowedflare.JupyterHub'
+c.JupyterHub.authenticator_class = 'allowedflare.jupyter.JupyterHub'
 
 ## The base URL of the entire application.
 #
