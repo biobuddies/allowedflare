@@ -21,10 +21,10 @@ RUN --mount=type=cache,target=/root/.npm \
 COPY requirements.txt .
 # hadolint ignore=DL3013,DL3042
 RUN --mount=type=cache,target=/root/.cache \
-    pip install --disable-pip-version-check --progress-bar off --upgrade \
+    pip install --disable-pip-version-check --progress-bar off --root-user-action --upgrade \
         "$(grep ^uv requirements.txt)" \
     && uv venv \
-    && uv pip sync requirements.txt
+    && uv pip sync --quiet requirements.txt
 
 RUN mkdir -p static
 
@@ -32,7 +32,7 @@ COPY . .
 
 ARG STATIC_URL
 ENV STATIC_URL ${STATIC_URL:-/static/}
-RUN STATIC_URL=${STATIC_URL} python -m manage collectstatic --no-input
+RUN STATIC_URL=${STATIC_URL} .venv/bin/python -m manage collectstatic --no-input
 
 EXPOSE 8001
 ENV PYTHONUNBUFFERED 1
