@@ -1,4 +1,4 @@
-FROM python:3.12
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
 # TODO assert C.UTF8 and PYTHONUNBUFFERED are set correctly
 
@@ -18,17 +18,13 @@ COPY package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm \
     npm install --frozen-lockfile
 
-# Should match requirements.txt
-COPY --from=ghcr.io/astral-sh/uv:0.4.30 /uv /uvx /bin/
 COPY requirements.txt ./
 # hadolint ignore=DL3013,DL3042
 RUN --mount=type=cache,target=/root/.cache \
-    pip install --disable-pip-version-check --progress-bar off --root-user-action ignore --upgrade \
-        "$(grep ^uv requirements.txt)" \
     && uv venv /venv \
-    && pwd \
-    && ls -a \
-    && uv pip sync --quiet requirements.txt
+    && /venv/bin/uv pip sync --quiet requirements.txt
+
+ENV PATH="/venv/bin:$PATH"
 
 RUN mkdir -p static
 
@@ -36,7 +32,7 @@ COPY . ./
 
 ARG STATIC_URL
 ENV STATIC_URL ${STATIC_URL:-/static/}
-RUN STATIC_URL=${STATIC_URL} .venv/bin/python -m manage collectstatic --no-input
+RUN STATIC_URL=${STATIC_URL} python -m manage collectstatic --no-input
 
 EXPOSE 8001
 ENV PYTHONUNBUFFERED 1
