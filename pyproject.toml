@@ -16,7 +16,7 @@ name = 'allowedflare'
 readme = 'README.md'
 
 [project.urls]
-Homepage = 'https://github.com/covracer/allowedflare'
+Homepage = 'https://github.com/biobuddies/allowedflare'
 
 [tool.codespell]
 ignore-words-list = 'afterall'

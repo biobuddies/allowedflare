@@ -1,5 +1,6 @@
 # pre-commit
 codespell
+git+https://github.com/AleksaC/hadolint-py.git
 mypy
 ruff
 shellcheck-py

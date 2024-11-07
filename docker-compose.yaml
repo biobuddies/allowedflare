@@ -2,9 +2,8 @@ services:
     proxy:
         image: cloudflare/cloudflared:2024.2.1
 
-    lab:
-        build: .
-        command: python -m manage shell_plus --allow-root
+    hub:
+        command: PATH="node_modules/.bin:$PATH" python -m jupyterhub
         depends_on:
             - postgres
         environment:
