@@ -14,7 +14,7 @@ repos:
           - id: mailmap
           - id: mypy
           - id: prettier-write
-            exclude: package-lock.json
+            exclude: ^package-lock\.json$
           - id: ruff-check-fix
           - id: ruff-format
           - id: shellcheck
@@ -27,5 +27,5 @@ repos:
           - id: yamllint
 exclude: |
     (?x)^(
-        package-lock.json
+        package-lock\.json
     )$

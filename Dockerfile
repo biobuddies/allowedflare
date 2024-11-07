@@ -4,8 +4,8 @@ FROM python:3.12
 
 WORKDIR /srv
 
-COPY includes.sh .
-# hadolint ignore=DL3008,SC2086
+COPY includes.sh ./
+# hadolint ignore=DL3008,SC2046
 RUN --mount=type=cache,target=/var/cache/apt \
     rm /etc/apt/apt.conf.d/docker-clean \
     && echo 'Binary::apt::APT::Keep-Downloaded-Packages "1";' > /etc/apt/apt.conf.d/99cache \
@@ -14,11 +14,11 @@ RUN --mount=type=cache,target=/var/cache/apt \
         $(sed -En 's/"$//; s/^PACKAGES="//p' includes.sh) \
     && rm -rf /var/lib/apt/lists/*
 
-COPY package.json package-lock.json .
+COPY package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm \
     npm install --frozen-lockfile
 
-COPY requirements.txt .
+COPY requirements.txt ./
 # hadolint ignore=DL3013,DL3042
 RUN --mount=type=cache,target=/root/.cache \
     pip install --disable-pip-version-check --progress-bar off --root-user-action --upgrade \
@@ -28,7 +28,7 @@ RUN --mount=type=cache,target=/root/.cache \
 
 RUN mkdir -p static
 
-COPY . .
+COPY . ./
 
 ARG STATIC_URL
 ENV STATIC_URL ${STATIC_URL:-/static/}
