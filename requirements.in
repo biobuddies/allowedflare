@@ -8,6 +8,7 @@ yamllint
 
 # Run-time dependencies
 cryptography
+dj-notebook
 django
 django-extensions
 django-health-check
