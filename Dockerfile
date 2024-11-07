@@ -21,7 +21,7 @@ RUN --mount=type=cache,target=/root/.npm \
 COPY requirements.txt ./
 # hadolint ignore=DL3013,DL3042
 RUN --mount=type=cache,target=/root/.cache \
-    && uv venv /venv \
+    uv venv /venv \
     && /venv/bin/uv pip sync --quiet requirements.txt
 
 ENV PATH="/venv/bin:$PATH"
