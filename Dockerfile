@@ -18,12 +18,14 @@ COPY package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm \
     npm install --frozen-lockfile
 
+# Should match requirements.txt
+COPY --from=ghcr.io/astral-sh/uv:0.4.30 /uv /uvx /bin/
 COPY requirements.txt ./
 # hadolint ignore=DL3013,DL3042
 RUN --mount=type=cache,target=/root/.cache \
     pip install --disable-pip-version-check --progress-bar off --root-user-action ignore --upgrade \
         "$(grep ^uv requirements.txt)" \
-    && uv venv \
+    && uv venv /venv \
     && pwd \
     && ls -a \
     && uv pip sync --quiet requirements.txt
