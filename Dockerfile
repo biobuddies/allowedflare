@@ -14,7 +14,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
         $(sed -En 's/"$//; s/^PACKAGES="//p' includes.sh) \
     && rm -rf /var/lib/apt/lists/*
 
-COPY package-lock.json .
+COPY package.json package-lock.json .
 RUN --mount=type=cache,target=/root/.npm \
     npm install --frozen-lockfile
 
