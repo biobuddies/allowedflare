@@ -9,9 +9,9 @@ COPY includes.sh .
 RUN --mount=type=cache,target=/var/cache/apt \
     rm /etc/apt/apt.conf.d/docker-clean \
     && echo 'Binary::apt::APT::Keep-Downloaded-Packages "1";' > /etc/apt/apt.conf.d/99cache \
-    && . includes.sh \
     && apt-get update \
-    && apt-get install --no-install-recommends --quiet --quiet --yes nodejs $PACKAGES \
+    && apt-get install --no-install-recommends --quiet --quiet --yes nodejs \
+        $(sed -En 's/"$//; s/^PACKAGES="//p' includes.sh) \
     && rm -rf /var/lib/apt/lists/*
 
 COPY package-lock.json .
