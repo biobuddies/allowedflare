@@ -65,7 +65,7 @@ def test_authenticate_jwk_client_error(monkeypatch):
 
 
 def test_authenticate_valid_token(mocker, monkeypatch):
-    private_key = generate_private_key(65537, 512, default_backend())
+    private_key = generate_private_key(65537, 1024, default_backend())
     token = {
         'aud': 'audience',
         'email': 'firstname.lastname@domain.com',
