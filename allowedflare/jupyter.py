@@ -1,7 +1,7 @@
 from jupyterhub.auth import Authenticator  # type: ignore
 from tornado.web import RequestHandler
 
-from allowedflare.allowedflare import authenticate
+from allowedflare import authenticate
 
 
 class JupyterHub(Authenticator):

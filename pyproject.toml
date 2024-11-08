@@ -15,8 +15,33 @@ dynamic = ['version']
 name = 'allowedflare'
 readme = 'README.md'
 
+[project.optional-dependencies]
+precommit = [
+    'codespell',
+    'django-stubs',
+    'djangorestframework-stubs[compatible-mypy]',
+    'hadolint-py @ git+https://github.com/AleksaC/hadolint-py.git',
+    'mypy',
+    'pre-commit',
+    'ruff',
+    'shellcheck-py',
+    'uv',
+    'yamllint',
+]
+demo = [
+    'dj-notebook',
+    'django',
+    'django-extensions',
+    'django-health-check',
+    'django-sql-explorer',
+    'djangorestframework',
+    'jupyterlab',
+]
+build = ['build', 'twine']
+test = ['pytest', 'pytest-django', 'pytest-mock']
+
 [project.urls]
-Homepage = 'https://github.com/covracer/allowedflare'
+Homepage = 'https://github.com/biobuddies/allowedflare'
 
 [tool.codespell]
 ignore-words-list = 'afterall'

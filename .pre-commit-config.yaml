@@ -9,16 +9,23 @@ repos:
                 - --write-changes
           - id: dot-yaml
           - id: gitignore-node-python
+          - id: hadolint
           - id: includes-sh
           - id: mailmap
           - id: mypy
           - id: prettier-write
+            exclude: ^package-lock\.json$
           - id: ruff-check-fix
           - id: ruff-format
           - id: shellcheck
           - id: uv-pip-compile
+            args:
+                - --all-extras
+                - --quiet
+                - pyproject.toml
+            files: pyproject.toml
           - id: yamllint
 exclude: |
     (?x)^(
-        package-lock.json
+        package-lock\.json
     )$

@@ -14,7 +14,7 @@ from django.http import HttpRequest, HttpResponse
 from django.http.response import HttpResponseBase
 from rest_framework.authentication import BaseAuthentication
 
-from allowedflare.allowedflare import authenticate
+from allowedflare import authenticate
 
 logger = logging.getLogger(__name__)
 

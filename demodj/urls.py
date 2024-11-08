@@ -19,7 +19,7 @@ from django.contrib.admin import site
 from django.urls import include, path
 from rest_framework import routers
 
-from allowedflare import LoginView
+from allowedflare.django import LoginView
 from . import views
 
 router = routers.DefaultRouter()

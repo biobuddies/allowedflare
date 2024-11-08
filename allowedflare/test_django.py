@@ -1,6 +1,6 @@
 from django.test import RequestFactory
 
-from allowedflare import LoginView
+from allowedflare.django import LoginView
 
 
 def test_allowedflare_login_view(monkeypatch, rf: RequestFactory):
