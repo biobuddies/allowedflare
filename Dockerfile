@@ -11,25 +11,24 @@ RUN --mount=type=cache,target=/var/cache/apt \
     rm /etc/apt/apt.conf.d/docker-clean \
     && echo 'Binary::apt::APT::Keep-Downloaded-Packages "1";' > /etc/apt/apt.conf.d/99cache \
     && apt-get update \
-    && apt-get install --no-install-recommends --quiet --quiet --yes nodejs npm \
+    && apt-get install -qq --no-install-recommends --yes nodejs npm \
         $(sed -En 's/"$//; s/^PACKAGES="//p' includes.sh) \
     && rm -rf /var/lib/apt/lists/*
 
+# Bind mount caused "EROFS: read-only file system, open '/srv/package-lock.json'"
+COPY package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm \
     --mount=type=bind,source=package.json,target=package.json \
-    --mount=type=bind,source=package-lock.json,target=package-lock.json \
     npm install --frozen-lockfile
 
 # Not using /srv/.venv because it would make volume-mounting /srv harder
-ENV PATH="/root/venv/bin:$PATH"
 ENV UV_COMPILE_BYTECODE=1
 ENV UV_LINK_MODE=copy
-ENV UV_PROJECT_ENVIRONMENT=/root/venv
+ENV UV_SYSTEM_PYTHON=1
 # hadolint ignore=DL3013,DL3042
 RUN --mount=type=cache,target=/root/.cache \
     --mount=type=bind,source=requirements.txt,target=requirements.txt \
-    uv venv \
-    && uv pip sync --quiet requirements.txt
+    uv pip sync --quiet requirements.txt
 
 COPY . ./
 
