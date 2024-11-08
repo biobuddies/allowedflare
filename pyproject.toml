@@ -20,7 +20,7 @@ precommit = [
     'codespell',
     'django-stubs',
     'djangorestframework-stubs[compatible-mypy]',
-    'hadolint-py @ git+https://github.com/AleksaC/hadolint-py.git',
+    # hadolint git link in requirements.in
     'mypy',
     'pre-commit',
     'ruff',

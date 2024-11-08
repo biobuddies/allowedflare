@@ -23,6 +23,7 @@ repos:
                 - --all-extras
                 - --quiet
                 - pyproject.toml
+                - requirements.in
             files: pyproject.toml
           - id: yamllint
 exclude: |
