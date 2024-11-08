@@ -1,0 +1,6 @@
+# When this was in pyproject.toml [project.optional-dependencies.pre-commit], PyPI complained:
+# Can't have direct dependency:
+# hadolint-py@ git+https://github.com/AleksaC/hadolint-py.git ; extra == "precommit".
+# See https://packaging.python.org/specifications/core-metadata for more information.
+
+hadolint-py @ git+https://github.com/AleksaC/hadolint-py.git
