@@ -56,7 +56,7 @@ def test_authenticate_invalid_token(monkeypatch):
 
 
 def test_authenticate_jwk_client_error(monkeypatch):
-    private_key = generate_private_key(65537, 512, default_backend())
+    private_key = generate_private_key(65537, 1024, default_backend())
     monkeypatch.setenv('ALLOWEDFLARE_ACCESS_URL', 'https://demo.cloudflareaccess.com')
     user, message, token = authenticate({'CF_Authorization': encode({}, private_key, 'RS256')})
     assert user == ''
