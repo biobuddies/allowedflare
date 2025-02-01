@@ -3,7 +3,7 @@ services:
         image: cloudflare/cloudflared:2024.2.1
 
     hub:
-        command: PATH="node_modules/.bin:$PATH" .venv/bin/python -m jupyterhub
+        command: PATH="node_modules/.bin:$PATH" python -m jupyterhub
         depends_on:
             - postgres
         environment:
@@ -28,7 +28,7 @@ services:
 
     web:
         build: .
-        command: .venv/bin/python -m manage runserver
+        command: python -m manage runserver
         depends_on:
             - postgres
         environment:
