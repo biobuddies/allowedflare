@@ -5,16 +5,19 @@ ENV PYTHONUNBUFFERED 1
 
 WORKDIR /srv
 
+# && chaining removes need for -o errexit; dash doesn't support -o pipefail
 # hadolint ignore=DL3008,SC2046
 RUN --mount=type=cache,target=/var/cache/apt \
     --mount=type=bind,source=includes.sh,target=includes.sh \
-    set -euxo pipefail \
+    set -ux \
     && rm /etc/apt/apt.conf.d/docker-clean \
     && echo 'Binary::apt::APT::Keep-Downloaded-Packages "1";' > /etc/apt/apt.conf.d/99cache \
     && apt-get update \
-    && apt-get install -qq --no-install-recommends --yes nodejs npm \
+    && apt-get install -qq --no-install-recommends --yes bash nodejs npm \
         $(sed -En "s/'$//; s/^PACKAGES='//p" includes.sh) \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && echo dash dash/sh boolean false | debconf-set-selections \
+    && DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash
 
 # Bind mount caused "EROFS: read-only file system, open '/srv/package-lock.json'"
 COPY package-lock.json ./
