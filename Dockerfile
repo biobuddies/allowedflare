@@ -12,7 +12,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     && echo 'Binary::apt::APT::Keep-Downloaded-Packages "1";' > /etc/apt/apt.conf.d/99cache \
     && apt-get update \
     && apt-get install -qq --no-install-recommends --yes nodejs npm \
-        $(sed -En 's/"$//; s/^PACKAGES="//p' includes.sh) \
+        $(sed -En "s/'$//; s/^PACKAGES='//p" includes.sh) \
     && rm -rf /var/lib/apt/lists/*
 
 # Bind mount caused "EROFS: read-only file system, open '/srv/package-lock.json'"
