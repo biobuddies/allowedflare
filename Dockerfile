@@ -10,7 +10,7 @@ WORKDIR /srv
 # hadolint ignore=DL3008,SC2046
 RUN --mount=type=cache,target=/var/cache/apt \
     --mount=type=bind,source=includes.sh,target=includes.sh \
-    && rm /etc/apt/apt.conf.d/docker-clean \
+    rm /etc/apt/apt.conf.d/docker-clean \
     && echo 'Binary::apt::APT::Keep-Downloaded-Packages "1";' > /etc/apt/apt.conf.d/99cache \
     && apt-get update \
     && apt-get install -qq --no-install-recommends --yes bash nodejs npm \
