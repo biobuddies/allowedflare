@@ -3,13 +3,13 @@ FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 # TODO assert C.UTF8 locale and PYTHONUNBUFFERED are set correctly
 ENV PYTHONUNBUFFERED 1
 
+SHELL ['/bin/bash', '-euxo pipefail', '-c']
+
 WORKDIR /srv
 
-# && chaining removes need for -o errexit; dash doesn't support -o pipefail
 # hadolint ignore=DL3008,SC2046
 RUN --mount=type=cache,target=/var/cache/apt \
     --mount=type=bind,source=includes.sh,target=includes.sh \
-    set -ux \
     && rm /etc/apt/apt.conf.d/docker-clean \
     && echo 'Binary::apt::APT::Keep-Downloaded-Packages "1";' > /etc/apt/apt.conf.d/99cache \
     && apt-get update \

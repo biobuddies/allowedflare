@@ -1,4 +1,19 @@
 services:
+    allowedflare:
+        depends_on:
+            - postgres
+        environment:
+            - ALLOWEDFLARE_ACCESS_URL
+            - ALLOWEDFLARE_AUDIENCE
+            - ALLOWEDFLARE_EMAIL_DOMAIN
+            - ALLOWEDFLARE_PRIVATE_DOMAIN
+        image: allowedflare:${GIHA:-local}
+        volumes:
+            - .:/srv
+        pull_policy: never
+        profiles:
+            - notup
+
     proxy:
         image: cloudflare/cloudflared:2024.2.1
 
@@ -11,9 +26,10 @@ services:
             - ALLOWEDFLARE_AUDIENCE
             - ALLOWEDFLARE_EMAIL_DOMAIN
             - ALLOWEDFLARE_PRIVATE_DOMAIN
-        image: allowedflare:${GASH:-local}
+        image: allowedflare:${GIHA:-local}
         volumes:
             - .:/srv
+        # TODO ports
         pull_policy: never
 
     postgres:
@@ -36,13 +52,12 @@ services:
             - ALLOWEDFLARE_AUDIENCE
             - ALLOWEDFLARE_EMAIL_DOMAIN
             - ALLOWEDFLARE_PRIVATE_DOMAIN
-        image: allowedflare:${GASH:-local}
-        ports:
-            # Should match manage.py
+        image: allowedflare:${GIHA:-local}
+        ports: # Should match manage.py
             - 8001:8001
+        pull_policy: never
         volumes:
             - .:/srv
-        pull_policy: never
 
 networks:
     interoperation:

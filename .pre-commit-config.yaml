@@ -21,7 +21,6 @@ repos:
           - id: uv-pip-compile
             args:
                 - --all-extras
-                - --quiet
                 - pyproject.toml
                 - requirements.in
             files: pyproject.toml
