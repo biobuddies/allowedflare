@@ -3,7 +3,7 @@ FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 # TODO assert C.UTF8 locale and PYTHONUNBUFFERED are set correctly
 ENV PYTHONUNBUFFERED 1
 
-SHELL ['/bin/bash', '-euxo pipefail', '-c']
+SHELL ["/bin/bash", "-euxo pipefail", "-c"]
 
 WORKDIR /srv
 
