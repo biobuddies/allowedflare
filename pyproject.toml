@@ -46,6 +46,9 @@ Homepage = 'https://github.com/biobuddies/allowedflare'
 [tool.codespell]
 ignore-words-list = 'afterall'
 
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = 'demodj.settings'
+
 [tool.ruff.format]
 quote-style = 'single'
 skip-magic-trailing-comma = true

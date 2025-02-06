@@ -3,17 +3,21 @@ FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 # TODO assert C.UTF8 locale and PYTHONUNBUFFERED are set correctly
 ENV PYTHONUNBUFFERED 1
 
+SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+
 WORKDIR /srv
 
 # hadolint ignore=DL3008,SC2046
 RUN --mount=type=cache,target=/var/cache/apt \
     --mount=type=bind,source=includes.sh,target=includes.sh \
-    rm /etc/apt/apt.conf.d/docker-clean \
-    && echo 'Binary::apt::APT::Keep-Downloaded-Packages "1";' > /etc/apt/apt.conf.d/99cache \
-    && apt-get update \
-    && apt-get install -qq --no-install-recommends --yes nodejs npm \
-        $(sed -En 's/"$//; s/^PACKAGES="//p' includes.sh) \
-    && rm -rf /var/lib/apt/lists/*
+    rm /etc/apt/apt.conf.d/docker-clean; \
+    echo 'Binary::apt::APT::Keep-Downloaded-Packages "1";' > /etc/apt/apt.conf.d/99cache; \
+    apt-get update; \
+    apt-get install -qq --no-install-recommends --yes bash nodejs npm \
+        $(sed -En "s/'$//; s/^PACKAGES='//p" includes.sh); \
+    rm -rf /var/lib/apt/lists/*; \
+    echo dash dash/sh boolean false | debconf-set-selections; \
+    DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash
 
 # Bind mount caused "EROFS: read-only file system, open '/srv/package-lock.json'"
 COPY package-lock.json ./
