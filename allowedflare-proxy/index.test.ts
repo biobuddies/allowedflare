@@ -1,6 +1,6 @@
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
-import { unstable_dev } from 'wrangler'
-import type { UnstableDevWorker } from 'wrangler'
+import {afterAll, beforeAll, describe, expect, it, vi} from 'vitest'
+import {unstable_dev} from 'wrangler'
+import type {UnstableDevWorker} from 'wrangler'
 
 global.fetch = vi.fn()
 
@@ -15,7 +15,7 @@ describe('Worker', () => {
 
     beforeAll(async () => {
         worker = await unstable_dev('allowedflare-proxy/index.ts', {
-            experimental: { disableExperimentalWarning: true },
+            experimental: {disableExperimentalWarning: true},
         })
     })
 

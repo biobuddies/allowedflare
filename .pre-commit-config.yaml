@@ -1,14 +1,15 @@
 repos:
     - repo: https://github.com/biobuddies/helicopyter
-      rev: v2025.03.01
+      rev: v2025.15.01
       hooks:
+          - id: actionlint
           - id: codespell
             args:
                 - --check-filenames
                 - --check-hidden
                 - --write-changes
+          - id: cookiecutter
           - id: dot-yaml
-          - id: gitignore-node-python
           - id: hadolint
           - id: includes-sh
           - id: mailmap

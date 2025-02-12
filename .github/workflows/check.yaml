@@ -10,21 +10,10 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
-            - uses: actions/setup-node@v4
-              with:
-                  cache: npm
-                  node-version-file: .nvmrc
+            - run: bash includes.sh forceready
             - run: npm install --frozen-lockfile
-            - uses: actions/setup-python@v5
-              with:
-                  python-version-file: .python-version
-
-            - run: |
-                  pip install --disable-pip-version-check --progress-bar off --upgrade \
-                      "$(grep ^uv requirements.txt)"
-
-            - run: uv venv
-            - run: source includes.sh && ups && a && pcam --color always --show-diff-on-failure
+            - run: bash includes.sh ups
+            - run: bash includes.sh pcam --color always --show-diff-on-failure
             - run: .venv/bin/python -m build
             - run: .venv/bin/twine check dist/*
             - run: .venv/bin/python -m manage check

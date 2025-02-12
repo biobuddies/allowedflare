@@ -3,4 +3,5 @@ exclude .*
 exclude .github/workflows/*
 exclude allowedflare-proxy/*
 exclude demodj/*
+include pypi_compatible_build.py
 include pyproject.toml
