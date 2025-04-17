@@ -13,7 +13,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     rm /etc/apt/apt.conf.d/docker-clean; \
     echo 'Binary::apt::APT::Keep-Downloaded-Packages "1";' > /etc/apt/apt.conf.d/99cache; \
     apt-get update; \
-    apt-get install -qq --no-install-recommends --yes bash nodejs npm \
+    apt-get install -qq --no-install-recommends --yes bash git nodejs npm \
         $(sed -En "s/'$//; s/^PACKAGES='//p" includes.sh); \
     rm -rf /var/lib/apt/lists/*; \
     echo dash dash/sh boolean false | debconf-set-selections; \
