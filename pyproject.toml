@@ -27,6 +27,7 @@ precommit = [
     'mypy',
     'pre-commit',
     'ruff',
+    'types-setuptools',
     'shellcheck-py',
     'uv',
     'yamllint',
