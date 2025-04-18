@@ -2,7 +2,7 @@
 #    uv pip compile --all-extras --output-file requirements.txt --python-platform linux pyproject.toml
 actionlint-py==1.7.7.23
     # via allowedflare (pyproject.toml)
-anyio==4.6.2.post1
+anyio==4.9.0
     # via
     #   httpx
     #   jupyter-server
@@ -18,19 +18,19 @@ asgiref==3.8.1
     # via
     #   django
     #   django-stubs
-asttokens==2.4.1
+asttokens==3.0.0
     # via stack-data
-async-lru==2.0.4
+async-lru==2.0.5
     # via jupyterlab
-attrs==24.2.0
+attrs==25.3.0
     # via
     #   cattrs
     #   django-schema-graph
     #   jsonschema
     #   referencing
-babel==2.16.0
+babel==2.17.0
     # via jupyterlab-server
-beautifulsoup4==4.12.3
+beautifulsoup4==4.13.4
     # via nbconvert
 binaryornot==0.4.4
     # via cookiecutter
@@ -38,7 +38,7 @@ bleach==6.2.0
     # via nbconvert
 build==1.2.2.post1
     # via allowedflare (pyproject.toml)
-cattrs==24.1.2
+cattrs==24.1.3
     # via django-schema-graph
 certifi==2024.8.30
     # via
@@ -57,7 +57,7 @@ charset-normalizer==3.4.0
     # via requests
 click==8.1.8
     # via cookiecutter
-codespell==2.3.0
+codespell==2.4.1
     # via allowedflare (pyproject.toml)
 comm==0.2.2
     # via
@@ -71,9 +71,9 @@ cryptography==43.0.3
     #   django-cryptography-django5
     #   django-sql-explorer
     #   secretstorage
-debugpy==1.8.7
+debugpy==1.8.14
     # via ipykernel
-decorator==5.1.1
+decorator==5.2.1
     # via ipython
 defusedxml==0.7.1
     # via nbconvert
@@ -81,7 +81,7 @@ distlib==0.3.9
     # via virtualenv
 dj-notebook==0.7.0
     # via allowedflare (pyproject.toml)
-django==5.1.3
+django==5.2
     # via
     #   allowedflare (pyproject.toml)
     #   dj-notebook
@@ -93,11 +93,11 @@ django==5.1.3
     #   django-stubs
     #   django-stubs-ext
     #   djangorestframework
-django-appconf==1.0.6
+django-appconf==1.1.0
     # via django-cryptography-django5
 django-cryptography-django5==2.2
     # via django-sql-explorer
-django-extensions==3.2.3
+django-extensions==4.1
     # via
     #   allowedflare (pyproject.toml)
     #   dj-notebook
@@ -109,23 +109,23 @@ django-schema-graph==3.1.0
     # via dj-notebook
 django-sql-explorer==5.3
     # via allowedflare (pyproject.toml)
-django-stubs==5.1.1
+django-stubs==5.1.3
     # via
     #   allowedflare (pyproject.toml)
     #   djangorestframework-stubs
-django-stubs-ext==5.1.1
+django-stubs-ext==5.1.3
     # via django-stubs
-djangorestframework==3.15.2
+djangorestframework==3.16.0
     # via allowedflare (pyproject.toml)
-djangorestframework-stubs==3.14.4
+djangorestframework-stubs==3.15.3
     # via allowedflare (pyproject.toml)
 docutils==0.21.2
     # via readme-renderer
-executing==2.1.0
+executing==2.2.0
     # via stack-data
-fastjsonschema==2.20.0
+fastjsonschema==2.21.1
     # via nbformat
-filelock==3.16.1
+filelock==3.18.0
     # via virtualenv
 fqdn==1.5.1
     # via jsonschema
@@ -133,11 +133,13 @@ h11==0.14.0
     # via httpcore
 hadolint-py @ git+https://github.com/AleksaC/hadolint-py.git@a54e4d51787678062c8e108b20782f00e707a40e
     # via allowedflare (pyproject.toml)
-httpcore==1.0.6
+httpcore==1.0.8
     # via httpx
-httpx==0.27.2
+httpx==0.28.1
     # via jupyterlab
-identify==2.6.1
+id==1.5.0
+    # via twine
+identify==2.6.9
     # via pre-commit
 idna==3.10
     # via
@@ -145,22 +147,22 @@ idna==3.10
     #   httpx
     #   jsonschema
     #   requests
-importlib-metadata==8.5.0
-    # via twine
-iniconfig==2.0.0
+iniconfig==2.1.0
     # via pytest
 ipykernel==6.29.5
     # via
     #   jupyter
     #   jupyter-console
     #   jupyterlab
-ipython==8.29.0
+ipython==9.1.0
     # via
     #   dj-notebook
     #   ipykernel
     #   ipywidgets
     #   jupyter-console
-ipywidgets==8.1.5
+ipython-pygments-lexers==1.1.1
+    # via ipython
+ipywidgets==8.1.6
     # via jupyter
 isoduration==20.11.0
     # via jsonschema
@@ -170,20 +172,20 @@ jaraco-context==6.0.1
     # via keyring
 jaraco-functools==4.1.0
     # via keyring
-jedi==0.19.1
+jedi==0.19.2
     # via ipython
-jeepney==0.8.0
+jeepney==0.9.0
     # via
     #   keyring
     #   secretstorage
-jinja2==3.1.4
+jinja2==3.1.6
     # via
     #   cookiecutter
     #   jupyter-server
     #   jupyterlab
     #   jupyterlab-server
     #   nbconvert
-json5==0.9.25
+json5==0.12.0
     # via jupyterlab-server
 jsonpointer==3.0.0
     # via jsonschema
@@ -214,11 +216,11 @@ jupyter-core==5.7.2
     #   nbclient
     #   nbconvert
     #   nbformat
-jupyter-events==0.10.0
+jupyter-events==0.12.0
     # via jupyter-server
 jupyter-lsp==2.2.5
     # via jupyterlab
-jupyter-server==2.14.2
+jupyter-server==2.15.0
     # via
     #   jupyter-lsp
     #   jupyterlab
@@ -227,7 +229,7 @@ jupyter-server==2.14.2
     #   notebook-shim
 jupyter-server-terminals==0.5.3
     # via jupyter-server
-jupyterlab==4.3.0
+jupyterlab==4.4.0
     # via
     #   allowedflare (pyproject.toml)
     #   jupyter
@@ -238,9 +240,9 @@ jupyterlab-server==2.27.3
     # via
     #   jupyterlab
     #   notebook
-jupyterlab-widgets==3.0.13
+jupyterlab-widgets==3.0.14
     # via ipywidgets
-keyring==25.5.0
+keyring==25.6.0
     # via twine
 markdown-it-py==3.0.0
     # via rich
@@ -254,21 +256,22 @@ matplotlib-inline==0.1.7
     #   ipython
 mdurl==0.1.2
     # via markdown-it-py
-mistune==3.0.2
+mistune==3.1.3
     # via nbconvert
-more-itertools==10.5.0
+more-itertools==10.6.0
     # via
     #   jaraco-classes
     #   jaraco-functools
-mypy==1.6.1
+mypy==1.15.0
     # via
     #   allowedflare (pyproject.toml)
+    #   django-stubs
     #   djangorestframework-stubs
 mypy-extensions==1.0.0
     # via mypy
-nbclient==0.10.0
+nbclient==0.10.2
     # via nbconvert
-nbconvert==7.16.4
+nbconvert==7.16.6
     # via
     #   jupyter
     #   jupyter-server
@@ -279,29 +282,31 @@ nbformat==5.10.4
     #   nbconvert
 nest-asyncio==1.6.0
     # via ipykernel
-nh3==0.2.18
+nh3==0.2.21
     # via readme-renderer
 nodeenv==1.9.1
     # via pre-commit
-notebook==7.0.7
+notebook==7.4.0
     # via jupyter
 notebook-shim==0.2.4
     # via
     #   jupyterlab
     #   notebook
-numpy==2.1.3
+numpy==2.2.4
     # via pandas
 overrides==7.7.0
     # via jupyter-server
-packaging==24.1
+packaging==24.2
     # via
     #   build
     #   ipykernel
+    #   jupyter-events
     #   jupyter-server
     #   jupyterlab
     #   jupyterlab-server
     #   nbconvert
     #   pytest
+    #   twine
 pandas==2.2.3
     # via
     #   dj-notebook
@@ -314,23 +319,21 @@ pathspec==0.12.1
     # via yamllint
 pexpect==4.9.0
     # via ipython
-pkginfo==1.10.0
-    # via twine
-platformdirs==4.3.6
+platformdirs==4.3.7
     # via
     #   jupyter-core
     #   virtualenv
 pluggy==1.5.0
     # via pytest
-pre-commit==4.0.1
+pre-commit==4.2.0
     # via allowedflare (pyproject.toml)
-prometheus-client==0.21.0
+prometheus-client==0.21.1
     # via jupyter-server
-prompt-toolkit==3.0.48
+prompt-toolkit==3.0.51
     # via
     #   ipython
     #   jupyter-console
-psutil==6.1.0
+psutil==7.0.0
     # via ipykernel
 ptyprocess==0.7.0
     # via
@@ -340,9 +343,10 @@ pure-eval==0.2.3
     # via stack-data
 pycparser==2.22
     # via cffi
-pygments==2.18.0
+pygments==2.19.1
     # via
     #   ipython
+    #   ipython-pygments-lexers
     #   jupyter-console
     #   nbconvert
     #   readme-renderer
@@ -351,12 +355,12 @@ pyjwt==2.9.0
     # via allowedflare (pyproject.toml)
 pyproject-hooks==1.2.0
     # via build
-pytest==8.3.3
+pytest==8.3.5
     # via
     #   allowedflare (pyproject.toml)
     #   pytest-django
     #   pytest-mock
-pytest-django==4.9.0
+pytest-django==4.11.1
     # via allowedflare (pyproject.toml)
 pytest-mock==3.14.0
     # via allowedflare (pyproject.toml)
@@ -365,13 +369,13 @@ python-dateutil==2.9.0.post0
     #   arrow
     #   jupyter-client
     #   pandas
-python-dotenv==1.0.1
+python-dotenv==1.1.0
     # via dj-notebook
-python-json-logger==2.0.7
+python-json-logger==3.3.0
     # via jupyter-events
 python-slugify==8.0.4
     # via cookiecutter
-pytz==2024.2
+pytz==2025.2
     # via pandas
 pyyaml==6.0.2
     # via
@@ -379,7 +383,7 @@ pyyaml==6.0.2
     #   jupyter-events
     #   pre-commit
     #   yamllint
-pyzmq==26.2.0
+pyzmq==26.4.0
     # via
     #   ipykernel
     #   jupyter-client
@@ -387,7 +391,7 @@ pyzmq==26.2.0
     #   jupyter-server
 readme-renderer==44.0
     # via twine
-referencing==0.35.1
+referencing==0.36.2
     # via
     #   jsonschema
     #   jsonschema-specifications
@@ -398,6 +402,7 @@ requests==2.32.3
     #   cookiecutter
     #   django-sql-explorer
     #   djangorestframework-stubs
+    #   id
     #   jupyterlab-server
     #   requests-toolbelt
     #   twine
@@ -413,40 +418,37 @@ rfc3986-validator==0.1.1
     # via
     #   jsonschema
     #   jupyter-events
-rich==13.9.4
+rich==14.0.0
     # via
     #   cookiecutter
     #   dj-notebook
     #   twine
-rpds-py==0.21.0
+rpds-py==0.24.0
     # via
     #   jsonschema
     #   referencing
-ruff==0.7.2
+ruff==0.11.6
     # via allowedflare (pyproject.toml)
 secretstorage==3.3.3
     # via keyring
 send2trash==1.8.3
     # via jupyter-server
-setuptools==75.3.0
+setuptools==78.1.0
     # via
     #   jupyterlab
     #   types-setuptools
 shellcheck-py==0.10.0.1
     # via allowedflare (pyproject.toml)
-six==1.16.0
+six==1.17.0
     # via
-    #   asttokens
     #   django-pandas
     #   python-dateutil
     #   rfc3339-validator
 sniffio==1.3.1
-    # via
-    #   anyio
-    #   httpx
+    # via anyio
 soupsieve==2.6
     # via beautifulsoup4
-sqlparse==0.5.1
+sqlparse==0.5.3
     # via
     #   django
     #   django-sql-explorer
@@ -459,8 +461,8 @@ terminado==0.18.1
 text-unidecode==1.3
     # via python-slugify
 tinycss2==1.4.0
-    # via nbconvert
-tornado==6.4.1
+    # via bleach
+tornado==6.4.2
     # via
     #   ipykernel
     #   jupyter-client
@@ -484,25 +486,28 @@ traitlets==5.14.3
     #   nbclient
     #   nbconvert
     #   nbformat
-twine==5.1.1
+twine==6.1.0
     # via allowedflare (pyproject.toml)
-types-python-dateutil==2.9.0.20241003
+types-python-dateutil==2.9.0.20241206
     # via arrow
-types-pyyaml==6.0.12.20240917
+types-pyyaml==6.0.12.20250402
     # via
     #   django-stubs
     #   djangorestframework-stubs
-types-requests==2.32.0.20241016
+types-requests==2.32.0.20250328
     # via djangorestframework-stubs
 types-setuptools==78.1.0.20250329
     # via allowedflare (pyproject.toml)
-typing-extensions==4.12.2
+typing-extensions==4.13.2
     # via
+    #   anyio
+    #   beautifulsoup4
     #   django-stubs
     #   django-stubs-ext
     #   djangorestframework-stubs
     #   mypy
-tzdata==2024.2
+    #   referencing
+tzdata==2025.2
     # via pandas
 uri-template==1.3.0
     # via jsonschema
@@ -511,13 +516,11 @@ urllib3==2.2.3
     #   requests
     #   twine
     #   types-requests
-uv==0.4.30
-    # via allowedflare (pyproject.toml)
-virtualenv==20.27.1
+virtualenv==20.30.0
     # via pre-commit
 wcwidth==0.2.13
     # via prompt-toolkit
-webcolors==24.8.0
+webcolors==24.11.1
     # via jsonschema
 webencodings==0.5.1
     # via
@@ -525,9 +528,7 @@ webencodings==0.5.1
     #   tinycss2
 websocket-client==1.8.0
     # via jupyter-server
-widgetsnbextension==4.0.13
+widgetsnbextension==4.0.14
     # via ipywidgets
-yamllint==1.35.1
+yamllint==1.37.0
     # via allowedflare (pyproject.toml)
-zipp==3.20.2
-    # via importlib-metadata

@@ -29,7 +29,7 @@ precommit = [
     'ruff',
     'types-setuptools',
     'shellcheck-py',
-    'uv',
+    # uv from asdf
     'yamllint',
 ]
 demo = [
