@@ -1,31 +1,35 @@
 [build-system]
+backend-path = ['']
+build-backend = 'pypi_compatible_build'
 requires = ['setuptools>=61.0', 'setuptools_scm[toml]>=6.2', 'wheel']
-build-backend = 'setuptools.build_meta'
 
 [project]
 classifiers = [
     'Programming Language :: Python :: 3',
-    'License :: OSI Approved :: BSD License',
     'Operating System :: OS Independent',
     'Topic :: Internet :: WWW/HTTP :: Session',
 ]
 description = 'Authenticate to Django with JSON Web Tokens (JWTs) signed by Cloudflare Access'
 dependencies = ['cryptography', 'pyjwt', 'requests']
 dynamic = ['version']
+license = 'BSD-3-Clause'
 name = 'allowedflare'
 readme = 'README.md'
 
 [project.optional-dependencies]
 precommit = [
+    'actionlint-py',
     'codespell',
+    'cookiecutter',
     'django-stubs',
     'djangorestframework-stubs[compatible-mypy]',
-    # hadolint git link in requirements.in
+    'hadolint-py @ git+https://github.com/AleksaC/hadolint-py.git',
     'mypy',
     'pre-commit',
     'ruff',
+    'types-setuptools',
     'shellcheck-py',
-    'uv',
+    # uv from asdf
     'yamllint',
 ]
 demo = [
@@ -69,6 +73,20 @@ ignore = [
 
 [tool.mypy]
 plugins = ['mypy_drf_plugin.main', 'mypy_django_plugin.main']
+enable_error_code = [
+    'ignore-without-code',
+    # briefly experimented with 'mutable-override' but couldn't handle narrowing like
+    # `str | None` in base class to just `str` in subclass
+    'redundant-cast',
+    'redundant-expr',
+    'redundant-self',
+    'truthy-bool',
+    'truthy-iterable',
+    'unimported-reveal',
+    'unreachable',
+    'unused-awaitable',
+    'unused-ignore',
+]
 
 [tool.setuptools]
 packages = ['allowedflare']

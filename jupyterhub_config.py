@@ -1,6 +1,6 @@
 # Configuration file for jupyterhub.
 
-c = get_config()  # type: ignore # noqa
+c = get_config()  # type: ignore[name-defined] # noqa
 
 # ------------------------------------------------------------------------------
 # Application(SingletonConfigurable) configuration
@@ -1231,7 +1231,7 @@ c.Spawner.notebook_dir = '~/code/allowedflare'
 #      user_options is serialized to JSON as part of this persistence
 #      (with additional support for bytes in case of uploaded file data),
 #      and any non-bytes non-jsonable values will be replaced with None
-#      if the user_options are re-used.
+#      if the user_options are reused.
 #  Default: traitlets.Undefined
 # c.Spawner.options_from_form = traitlets.Undefined
 
