@@ -15,7 +15,7 @@ jobs:
             - run: bash includes.sh ups
             - run: |
                   PATH=".venv/bin:$PATH" bash includes.sh pcam --color always --show-diff-on-failure
-            - run: .venv/bin/python -m build
+            - run: .venv/bin/python -m build --installer=uv
             - run: .venv/bin/twine check dist/*
             - run: .venv/bin/python -m manage check
             - run: .venv/bin/python -m manage makemigrations --check
