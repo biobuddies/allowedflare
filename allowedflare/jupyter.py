@@ -1,4 +1,4 @@
-from jupyterhub.auth import Authenticator  # type: ignore
+from jupyterhub.auth import Authenticator  # type: ignore[import-not-found]
 from tornado.web import RequestHandler
 
 from allowedflare import authenticate

@@ -73,6 +73,20 @@ ignore = [
 
 [tool.mypy]
 plugins = ['mypy_drf_plugin.main', 'mypy_django_plugin.main']
+enable_error_code = [
+    'ignore-without-code',
+    # briefly experimented with 'mutable-override' but couldn't handle narrowing like
+    # `str | None` in base class to just `str` in subclass
+    'redundant-cast',
+    'redundant-expr',
+    'redundant-self',
+    'truthy-bool',
+    'truthy-iterable',
+    'unimported-reveal',
+    'unreachable',
+    'unused-awaitable',
+    'unused-ignore',
+]
 
 [tool.setuptools]
 packages = ['allowedflare']

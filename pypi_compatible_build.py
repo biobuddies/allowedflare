@@ -10,7 +10,7 @@ from typing import TextIO
 
 import setuptools
 from packaging.metadata import Metadata
-from setuptools._core_metadata import _write_requirements  # type: ignore[import-untyped]
+from setuptools._core_metadata import _write_requirements  # type: ignore[import-not-found]
 from setuptools.build_meta import *  # noqa: F403
 
 
