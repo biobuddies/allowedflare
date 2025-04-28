@@ -32,6 +32,7 @@ urlpatterns = [
     path('explore/', include('explorer.urls')),
     path('health/', include('health_check.urls')),
     path('api/', include(router.urls)),
+    path('sleep/', views.sleepy_view, name='sleep'),
 ]
 
 urlpatterns += router.urls

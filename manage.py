@@ -13,7 +13,7 @@ def main() -> None:
         from django.core.management.commands.runserver import Command
 
         Command.default_addr = '0.0.0.0'  # noqa: S104
-        Command.default_port = '8001'  # Should match docker-compose.yml
+        Command.default_port = '8001'  # Should match docker-compose.yaml and gunicorn.conf.py
     except ImportError as exc:
         raise ImportError(
             "Couldn't import Django. Are you sure it's installed and "
