@@ -1,32 +1,28 @@
 repos:
     - repo: https://github.com/biobuddies/helicopyter
-      rev: v2025.15.01
+      rev: v2025.23.02
       hooks:
-          - id: actionlint
-          - id: codespell
-            args:
-                - --check-filenames
-                - --check-hidden
-                - --write-changes
+          # Fetch configuration for other tools
           - id: cookiecutter
-          - id: dot-yaml
-          - id: hadolint
-          - id: includes-sh
-          - id: mailmap
-          - id: mypy
+
+          # Autoformatters may change line numbers
+          - id: end-of-file-fixer
           - id: prettier-write
-            exclude: ^package-lock\.json$
           - id: ruff-check-fix
           - id: ruff-format
-          - id: shellcheck
+          - id: trailing-whitespace-fixer
+          - id: typos
           - id: uv-pip-compile
-            args:
-                - --all-extras
-                - pyproject.toml
-                - requirements.in
-            files: pyproject.toml
+
+          # Lint last
+          - id: actionlint
+          - id: hadolint
+          - id: mailmap
+          - id: mypy
+          - id: shellcheck
           - id: yamllint
 exclude: |
     (?x)^(
-        package-lock\.json
+        \.gitignore
+        |package-lock\.json
     )$

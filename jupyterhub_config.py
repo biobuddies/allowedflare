@@ -1215,7 +1215,7 @@ c.Spawner.notebook_dir = '~/code/allowedflare'
 #  function to understand single-values, numbers, etc.
 #
 #  This should coerce form data into the structure expected by self.user_options,
-#  which must be a dict, and should be JSON-serializeable, though it can contain
+#  which must be a dict, and should be JSON-serializable, though it can contain
 #  bytes in addition to standard JSON data types.
 #
 #  This method should not have any side effects. Any handling of `user_options`

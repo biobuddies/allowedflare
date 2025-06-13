@@ -26,9 +26,11 @@ precommit = [
     'hadolint-py @ git+https://github.com/AleksaC/hadolint-py.git',
     'mypy',
     'pre-commit',
+    'pre-commit-hooks',
     'ruff',
-    'types-setuptools',
     'shellcheck-py',
+    'types-setuptools',
+    'typos',
     # uv from asdf
     'yamllint',
 ]
