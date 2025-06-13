@@ -1,39 +1,26 @@
 repos:
     - repo: https://github.com/biobuddies/helicopyter
-      rev: v2025.23.01
+      rev: v2025.23.02
       hooks:
-          - id: cookiecutter # First because it fetches configuration files for other tools
+          # Fetch configuration for other tools
+          - id: cookiecutter
+
+          # Autoformatters may change line numbers
+          - id: end-of-file-fixer
+          - id: prettier-write
+          - id: ruff-check-fix
+          - id: ruff-format
+          - id: trailing-whitespace-fixer
+          - id: typos
+          - id: uv-pip-compile
+
+          # Lint last
           - id: actionlint
           - id: hadolint
           - id: mailmap
           - id: mypy
-          - id: prettier-write
-          - id: ruff-check-fix
-          - id: ruff-format
           - id: shellcheck
-          - id: typos
-          - id: uv-pip-compile
-            args:
-                - --all-extras
-                - pyproject.toml
-                - requirements.in
-            files: pyproject.toml
           - id: yamllint
-    - repo: local
-      hooks:
-          - id: end-of-file-fixer
-            entry: end-of-file-fixer
-            language: system
-            name: end-of-file-fixer
-            types:
-                - text
-          - id: trailing-whitespace-fixer
-            entry: trailing-whitespace-fixer
-            exclude: ^\.github/pull_request_template\.md$
-            language: system
-            name: trailing-whitespace-fixer
-            types:
-                - text
 exclude: |
     (?x)^(
         \.gitignore
