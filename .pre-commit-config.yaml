@@ -1,24 +1,17 @@
 repos:
     - repo: https://github.com/biobuddies/helicopyter
-      rev: v2025.15.01
+      rev: v2025.23.01
       hooks:
+          - id: cookiecutter # First because it fetches configuration files for other tools
           - id: actionlint
-          - id: codespell
-            args:
-                - --check-filenames
-                - --check-hidden
-                - --write-changes
-          - id: cookiecutter
-          - id: dot-yaml
           - id: hadolint
-          - id: includes-sh
           - id: mailmap
           - id: mypy
           - id: prettier-write
-            exclude: ^package-lock\.json$
           - id: ruff-check-fix
           - id: ruff-format
           - id: shellcheck
+          - id: typos
           - id: uv-pip-compile
             args:
                 - --all-extras
@@ -26,7 +19,23 @@ repos:
                 - requirements.in
             files: pyproject.toml
           - id: yamllint
+    - repo: local
+      hooks:
+          - id: end-of-file-fixer
+            entry: end-of-file-fixer
+            language: system
+            name: end-of-file-fixer
+            types:
+                - text
+          - id: trailing-whitespace-fixer
+            entry: trailing-whitespace-fixer
+            exclude: ^\.github/pull_request_template\.md$
+            language: system
+            name: trailing-whitespace-fixer
+            types:
+                - text
 exclude: |
     (?x)^(
-        package-lock\.json
+        \.gitignore
+        |package-lock\.json
     )$
