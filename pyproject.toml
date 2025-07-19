@@ -28,8 +28,9 @@ precommit = [
     'pre-commit',
     'pre-commit-hooks',
     'ruff',
-    'shellcheck-py',
     'types-setuptools',
+    'shellcheck-py',
+    'shfmt-py',
     'typos',
     # uv from asdf
     'yamllint',
@@ -45,7 +46,7 @@ demo = [
     'jupyterlab',
 ]
 build = ['build', 'twine']
-test = ['pytest', 'pytest-django', 'pytest-mock']
+test = ['pytest', 'pytest-cov', 'pytest-django', 'pytest-mock']
 
 [project.urls]
 Homepage = 'https://github.com/biobuddies/allowedflare'

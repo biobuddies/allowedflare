@@ -2,27 +2,19 @@ repos:
     - repo: https://github.com/biobuddies/helicopyter
       rev: v2025.23.02
       hooks:
-          # Fetch configuration for other tools
+          # Generate files
           - id: cookiecutter
-
-          # Autoformatters may change line numbers
-          - id: end-of-file-fixer
+          # Modify line numbers
           - id: prettier-write
           - id: ruff-check-fix
           - id: ruff-format
-          - id: trailing-whitespace-fixer
-          - id: typos
+          - id: shfmt
           - id: uv-pip-compile
-
-          # Lint last
+          # Report line numbers
           - id: actionlint
           - id: hadolint
           - id: mailmap
           - id: mypy
           - id: shellcheck
+          - id: typos
           - id: yamllint
-exclude: |
-    (?x)^(
-        \.gitignore
-        |package-lock\.json
-    )$
