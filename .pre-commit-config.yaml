@@ -1,6 +1,6 @@
 repos:
     - repo: https://github.com/biobuddies/helicopyter
-      rev: v2025.23.02
+      rev: v2025.28.01
       hooks:
           # Fetch files
           - id: cookiecutter
