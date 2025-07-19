@@ -2,25 +2,38 @@ defaults:
     run:
         shell: bash --noprofile --norc -o errexit -o nounset -o pipefail -o xtrace {0}
 jobs:
-    build:
+    build-container:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
             - run: bash includes.sh dcb
-            - run: bash includes.sh dcr web python -m pytest
+            - run: bash includes.sh dcr web python -m manage check
+
+    build-wheel:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - run: bash includes.sh forceready
+            - run: bash includes.sh ups
+            - run: source includes.sh && .venv/bin/python -m build --installer=uv
+            - run: .venv/bin/twine check dist/*
 
     check:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
             - run: bash includes.sh forceready
-            - run: bash includes.sh ups
             - run: |
                   PATH=".venv/bin:$PATH" bash includes.sh pcam --color always --show-diff-on-failure
-            - run: source includes.sh && .venv/bin/python -m build --installer=uv
-            - run: .venv/bin/twine check dist/*
             - run: .venv/bin/python -m manage check
             - run: .venv/bin/python -m manage makemigrations --check
+
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - run: bash includes.sh forceready
+            - run: just test
 
     summarize:
         runs-on: ubuntu-latest
