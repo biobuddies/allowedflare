@@ -2,17 +2,18 @@ services:
     allowedflare:
         depends_on:
             - postgres
+        develop: &srv
+            watch:
+                - action: sync
+                  patch: .
+                  target: /srv
+                  ignore: .venv
         environment:
             - ALLOWEDFLARE_ACCESS_URL
             - ALLOWEDFLARE_AUDIENCE
             - ALLOWEDFLARE_EMAIL_DOMAIN
             - ALLOWEDFLARE_PRIVATE_DOMAIN
         image: allowedflare:${GIHA:-local}
-        watch: &srv
-            - action: sync
-              patch: .
-              target: /srv
-              ignore: .venv
         pull_policy: never
         profiles:
             - notup
@@ -24,13 +25,13 @@ services:
         command: PATH="node_modules/.bin:$PATH" python -m jupyterhub
         depends_on:
             - postgres
+        develop: *srv
         environment:
             - ALLOWEDFLARE_ACCESS_URL
             - ALLOWEDFLARE_AUDIENCE
             - ALLOWEDFLARE_EMAIL_DOMAIN
             - ALLOWEDFLARE_PRIVATE_DOMAIN
         image: allowedflare:${GIHA:-local}
-        watch: *srv
         # TODO ports
         pull_policy: never
 
@@ -49,6 +50,7 @@ services:
         command: gunicorn
         depends_on:
             - postgres
+        develop: *srv
         environment:
             - ALLOWEDFLARE_ACCESS_URL
             - ALLOWEDFLARE_AUDIENCE
@@ -58,7 +60,6 @@ services:
         ports: # Should match manage.py and gunicorn.conf.py
             - 8001:8001
         pull_policy: never
-        watch: *srv
 
 networks:
     interoperation:
