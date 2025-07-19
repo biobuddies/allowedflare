@@ -1,3 +1,6 @@
+defaults:
+    run:
+        shell: bash --noprofile --norc -o errexit -o nounset -o pipefail -o xtrace {0}
 jobs:
     build:
         runs-on: ubuntu-latest
@@ -11,7 +14,6 @@ jobs:
         steps:
             - uses: actions/checkout@v4
             - run: bash includes.sh forceready
-            - run: npm install --frozen-lockfile
             - run: bash includes.sh ups
             - run: |
                   PATH=".venv/bin:$PATH" bash includes.sh pcam --color always --show-diff-on-failure
