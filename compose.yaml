@@ -7,7 +7,8 @@ services:
                 - action: sync
                   patch: .
                   target: /srv
-                  ignore: .venv
+                  ignore:
+                      - .venv
         environment:
             - ALLOWEDFLARE_ACCESS_URL
             - ALLOWEDFLARE_AUDIENCE
