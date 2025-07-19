@@ -27,6 +27,8 @@ RUN --mount=type=cache,target=/var/cache/apt \
     echo 'Binary::apt::APT::Keep-Downloaded-Packages "1";' > /etc/apt/apt.conf.d/99cache; \
     echo dash dash/sh boolean false | debconf-set-selections; \
     DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash; \
+    USER=root; \
+    export USER; \
     # workaround pstools absence
     ps() { xargs --null -E '\0' <"/proc/$2/cmdline"; }; \
     export -f ps; \
