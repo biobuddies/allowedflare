@@ -19,9 +19,11 @@ ENV UV_SYSTEM_PYTHON=1
 # hadolint ignore=DL3008, DL3013, DL3042, DL4006, SC2046, SC2239
 RUN --mount=type=cache,target=/var/cache/apt \
     --mount=type=bind,source=.biobuddies/includes.bash,target=.biobuddies/includes.bash \
+    --mount=type=bind,source=.tool-versions,target=.tool-versions \
     --mount=type=cache,target=/root/.npm \
     --mount=type=bind,source=package.json,target=package.json \
     --mount=type=cache,target=/root/.cache \
+    --mount=type=bind,source=.python-version,target=.python-version \
     --mount=type=bind,source=requirements.txt,target=requirements.txt \
     rm /etc/apt/apt.conf.d/docker-clean; \
     echo 'Binary::apt::APT::Keep-Downloaded-Packages "1";' > /etc/apt/apt.conf.d/99cache; \
