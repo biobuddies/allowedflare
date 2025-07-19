@@ -445,6 +445,8 @@ ruamel-yaml-clib==0.2.12
     # via ruamel-yaml
 ruff==0.11.6
     # via allowedflare (pyproject.toml)
+rust-just==1.42.2
+    # via allowedflare (pyproject.toml)
 secretstorage==3.3.3
     # via keyring
 send2trash==1.8.3
