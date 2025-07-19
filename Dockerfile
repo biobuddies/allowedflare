@@ -14,7 +14,6 @@ COPY package-lock.json ./
 # TODO: switch to watch.action=sync with ignore
 ENV UV_COMPILE_BYTECODE=1
 ENV UV_LINK_MODE=copy
-ENV UV_SYSTEM_PYTHON=1
 
 # hadolint ignore=DL3008, DL3013, DL3042, DL4006, SC2046, SC2239
 RUN --mount=type=cache,target=/var/cache/apt \
