@@ -2,9 +2,9 @@ repos:
     - repo: https://github.com/biobuddies/helicopyter
       rev: v2025.23.02
       hooks:
-          # Generate files
+          # Fetch files
           - id: cookiecutter
-          # Modify line numbers
+          # Change line numbers
           - id: prettier-write
           - id: ruff-check-fix
           - id: ruff-format

@@ -28,9 +28,9 @@ precommit = [
     'pre-commit',
     'pre-commit-hooks',
     'ruff',
-    'types-setuptools',
     'shellcheck-py',
     'shfmt-py',
+    'types-setuptools',
     'typos',
     # uv from asdf
     'yamllint',
