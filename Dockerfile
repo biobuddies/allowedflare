@@ -28,9 +28,8 @@ RUN --mount=type=cache,target=/var/cache/apt \
     echo dash dash/sh boolean false | debconf-set-selections; \
     DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash; \
     # workaround pstools absence
-    ps() { xargs -E '\0' </proc/$2/cmdline; }; \
+    ps() { xargs --null -E '\0' <"/proc/$2/cmdline"; }; \
     export -f ps; \
-    ps -p $$ -o 'comm='; \
     bash .biobuddies/includes.bash forceready; \
     rm -rf /var/lib/apt/lists/*;
 
