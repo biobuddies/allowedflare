@@ -29,8 +29,8 @@ RUN --mount=type=cache,target=/var/cache/apt \
     DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash; \
     USER=root; \
     export USER; \
-    # workaround pstools absence
-    ps() { xargs --null -E '\0' <"/proc/$2/cmdline"; }; \
+    # workaround pstools absence; expected to raise warning about null
+    ps() { xargs -E '\0' <"/proc/$2/cmdline"; }; \
     export -f ps; \
     echo "covdebug USER=$USER"; \
     bash .biobuddies/includes.bash forceready; \
