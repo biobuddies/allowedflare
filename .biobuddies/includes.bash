@@ -298,10 +298,9 @@ ups() {
 }
 
 asdf_url=https://github.com/asdf-vm/asdf/releases/download/v0.16.7/asdf-v0.16.7-linux-amd64.tar.gz
-echo covdebug 301
+
 forceready() {
     : 'FORCE system to be READY for development, clobbering current settings'
-    echo covdebug 304
     if [[ $shell != *bash ]]; then
         chsh -s /bin/bash
         echo 'Shell changed to BASH. Please restart your shell and rerun forceready.'
@@ -378,8 +377,7 @@ export INSH_EMAIL=youremail@yourdomain.tld; forceready'
     git config --global push.default current
     git config --global rebase.autosquash true
 
-    echo covdebug 381
-    asdf current  || true
+    asdf current
     # might be nice to show tofu, python, terraform, versions like calling pathver
 
     ups "$@"
