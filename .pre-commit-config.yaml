@@ -5,10 +5,12 @@ repos:
           # Fetch files
           - id: cookiecutter
           # Change line numbers
+          - id: end-of-file-fixer
           - id: prettier-write
           - id: ruff-check-fix
           - id: ruff-format
           - id: shfmt
+          - id: trailing-whitespace-fixer
           - id: uv-pip-compile
           # Report line numbers
           - id: actionlint
