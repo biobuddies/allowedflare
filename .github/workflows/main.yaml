@@ -6,6 +6,9 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
+            - uses: docker/setup-compose-action@v1
+              with:
+                  version: v2.32.4
             - run: bash .biobuddies/includes.bash dcb
             - run: bash .biobuddies/includes.bash dcr web python -m manage check
 
