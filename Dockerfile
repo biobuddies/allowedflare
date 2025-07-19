@@ -3,14 +3,7 @@ FROM debian:bookworm-slim
 # TODO assert C.UTF8 locale and PYTHONUNBUFFERED are set correctly
 ENV PYTHONUNBUFFERED 1
 
-SHELL [ \
-    "/bin/bash", \
-    "-o", "errexit", \
-    "-o", "nounset", \
-    "-o", "pipefail", \
-    "-o", "xtrace", \
-    "-c", \
-]
+SHELL [ "/bin/bash", "-o", "errexit", "-o", "nounset", "-o", "pipefail", "-o", "xtrace", "-c" ]
 
 WORKDIR /srv
 
