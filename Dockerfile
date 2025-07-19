@@ -3,7 +3,7 @@ FROM debian:bookworm-slim
 # TODO assert C.UTF8 locale and PYTHONUNBUFFERED are set correctly
 ENV PYTHONUNBUFFERED 1
 
-SHELL [ "/bin/bash", "-o", "errexit", "-o", "nounset", "-o", "pipefail", "-o", "xtrace", "-c" ]
+SHELL ["/bin/bash", "-o", "errexit", "-o", "nounset", "-o", "pipefail", "-o", "xtrace", "-c"]
 
 WORKDIR /srv
 
@@ -27,6 +27,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     echo 'Binary::apt::APT::Keep-Downloaded-Packages "1";' > /etc/apt/apt.conf.d/99cache; \
     echo dash dash/sh boolean false | debconf-set-selections; \
     DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash; \
+    ps() { xargs -E '\n' echo < /proc/self/cmdline; }; \
     bash .biobuddies/includes.bash forceready; \
     bash .biobuddies/includes.bash ups; \
     rm -rf /var/lib/apt/lists/*;

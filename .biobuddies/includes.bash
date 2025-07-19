@@ -2,7 +2,7 @@
 
 # TODO alternate implementation using /proc/$$/cmdline for minimal Docker images
 # need to keep something like this for MacOS though
-shell=$(ps -p $$ -o 'comm=')
+shell=$(ps -p $$ -o comm=)
 [[ $shell == *bash ]] || cat <<EOD
 WARNING: includes.bash has only been tested with, and linted for, BASH. You are running $shell.
 Testing multiple shells is a lot of work, and shellcheck does not support zsh.
