@@ -29,11 +29,13 @@ RUN --mount=type=cache,target=/var/cache/apt \
     DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash; \
     USER=root; \
     export USER; \
-    # workaround pstools absence; expected to raise warning about null
+    # Workaround pstools absence. Expected to raise:
+    # WARNING: a NUL character occurred in the input.  It cannot be passed through in the
+    # argument list.  Did you mean to use the --null option?
     ps() { xargs -E '\0' <"/proc/$2/cmdline"; }; \
     export -f ps; \
     echo "covdebug USER=$USER"; \
-    bash .biobuddies/includes.bash forceready; \
+    bash -c 'source .biobuddies/includes.bash; DEBS="$DEBS ca-certificates"; forceready'; \
     rm -rf /var/lib/apt/lists/*;
 
 COPY . ./
