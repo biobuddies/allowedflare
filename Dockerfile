@@ -30,6 +30,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     # workaround pstools absence
     ps() { xargs --null -E '\0' <"/proc/$2/cmdline"; }; \
     export -f ps; \
+    echo "covdebug USER=$USER"; \
     bash .biobuddies/includes.bash forceready; \
     rm -rf /var/lib/apt/lists/*;
 
