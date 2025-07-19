@@ -40,7 +40,7 @@ COPY . ./
 
 ARG STATIC_URL
 ENV STATIC_URL ${STATIC_URL:-/static/}
-# hadolint ignore=SC2239
-RUN mkdir -p static; STATIC_URL=${STATIC_URL} python -m manage collectstatic --no-input
+RUN mkdir -p static; \
+    STATIC_URL=${STATIC_URL} /srv/.venv/bin/python -m manage collectstatic --no-input
 
 EXPOSE 8001
