@@ -8,13 +8,16 @@ services:
             - ALLOWEDFLARE_EMAIL_DOMAIN
             - ALLOWEDFLARE_PRIVATE_DOMAIN
         image: allowedflare:${GIHA:-local}
-        volumes:
-            - .:/srv
+        watch: &srv
+            - action: sync
+              patch: .
+              target: /srv
+              ignore: .venv
         pull_policy: never
         profiles:
             - notup
 
-    proxy:
+    cloudflared:
         image: cloudflare/cloudflared:2024.2.1
 
     hub:
@@ -27,8 +30,7 @@ services:
             - ALLOWEDFLARE_EMAIL_DOMAIN
             - ALLOWEDFLARE_PRIVATE_DOMAIN
         image: allowedflare:${GIHA:-local}
-        volumes:
-            - .:/srv
+        watch: *srv
         # TODO ports
         pull_policy: never
 
@@ -56,8 +58,7 @@ services:
         ports: # Should match manage.py and gunicorn.conf.py
             - 8001:8001
         pull_policy: never
-        volumes:
-            - .:/srv
+        watch: *srv
 
 networks:
     interoperation:
