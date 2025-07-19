@@ -5,7 +5,7 @@ services:
         develop: &srv
             watch:
                 - action: sync
-                  patch: .
+                  path: .
                   target: /srv
                   ignore:
                       - .venv
