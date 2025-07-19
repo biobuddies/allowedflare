@@ -377,7 +377,7 @@ export INSH_EMAIL=youremail@yourdomain.tld; forceready'
     git config --global push.default current
     git config --global rebase.autosquash true
 
-    asdf current
+    asdf current  || true
     # might be nice to show tofu, python, terraform, versions like calling pathver
 
     ups "$@"
