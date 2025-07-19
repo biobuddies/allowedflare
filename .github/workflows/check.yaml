@@ -34,7 +34,7 @@ jobs:
         steps:
             - uses: actions/checkout@v4
             - run: bash .biobuddies/includes.bash forceready
-            - run: just test
+            - run: PATH=".venv/bin:$PATH" just test
 
     summarize:
         runs-on: ubuntu-latest
