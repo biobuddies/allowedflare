@@ -1,0 +1,46 @@
+defaults:
+    run:
+        shell: bash --noprofile --norc -o errexit -o nounset -o pipefail -o xtrace {0}
+jobs:
+    container:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - run: bash .biobuddies/includes.bash dcr web /srv/.venv/bin/python -m manage check
+
+    precommit:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - run: bash .biobuddies/includes.bash forceready
+            - run: |
+                  PATH=".venv/bin:$PATH" \
+                      bash .biobuddies/includes.bash pcam --color always --show-diff-on-failure
+            - run: .venv/bin/python -m manage check
+            - run: .venv/bin/python -m manage makemigrations --check
+
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - run: bash .biobuddies/includes.bash forceready
+            - run: PATH=".venv/bin:$PATH" just test
+
+    summarize:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - run: bash .biobuddies/includes.bash summarize
+
+    wheel:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - run: bash .biobuddies/includes.bash forceready
+            - run: source .biobuddies/includes.bash && .venv/bin/python -m build --installer=uv
+            - run: .venv/bin/twine check dist/*
+
+name: actions
+
+on: # yamllint disable-line rule:truthy
+    - pull_request
