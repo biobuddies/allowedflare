@@ -11,6 +11,7 @@ repos:
           - id: ruff-format
           - id: shfmt
           - id: trailing-whitespace-fixer
+            exclude: ^(\.gitignore|\.github/pull_request_template\.md)$
           - id: uv-pip-compile
           # Report line numbers
           - id: actionlint

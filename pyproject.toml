@@ -23,7 +23,7 @@ precommit = [
     'cookiecutter',
     'django-stubs',
     'djangorestframework-stubs[compatible-mypy]',
-    'hadolint-py @ git+https://github.com/AleksaC/hadolint-py.git',
+    'hadolint-py',
     'mypy',
     'pre-commit',
     'pre-commit-hooks',
