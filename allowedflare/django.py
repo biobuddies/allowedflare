@@ -64,7 +64,7 @@ class Backend(ModelBackend):
     ) -> User | None:
         if not request:
             return None
-        username_from_token, message, token = authenticate(request.COOKIES)
+        username_from_token, _, message, token = authenticate(request.COOKIES)
         if not username_from_token:
             logger.info(message)
             return None
@@ -86,10 +86,10 @@ class Backend(ModelBackend):
 
 
 class LoginView(DjangoLoginView):
-    template_name = 'login.html'
+    template_name = 'login.dj.html'
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        self.username, message, _ = authenticate(self.request.COOKIES)
+        self.username, _, message, _ = authenticate(self.request.COOKIES)
         self.extra_context = {**(self.extra_context or {}), 'allowedflare_message': message}
         return super().get(request, *args, **kwargs)
 
@@ -110,7 +110,7 @@ def login_view_wrapper(request: HttpRequest) -> HttpResponseBase:
 
 class Authentication(BaseAuthentication):
     def authenticate(self, request: HttpRequest) -> tuple[User | None, dict | None]:
-        username, message, token = authenticate(request.COOKIES)
+        username, _, message, token = authenticate(request.COOKIES)
         logger.info(message)
         if not username:
             return (None, None)

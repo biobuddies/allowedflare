@@ -76,6 +76,7 @@ ignore = [
 ]
 
 [tool.mypy]
+mypy_path = 'types'
 plugins = ['mypy_drf_plugin.main', 'mypy_django_plugin.main']
 enable_error_code = [
     'ignore-without-code',
@@ -96,3 +97,6 @@ enable_error_code = [
 packages = ['allowedflare']
 
 [tool.setuptools_scm]
+
+[tool.typos.default.extend-identifiers]
+STatus = 'STatus'

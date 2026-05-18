@@ -82,5 +82,6 @@ class YourAppConfig(AppConfig):
   https://django-rest-framework-simplejwt.readthedocs.io/en/latest/index.html
   already provide this functionality?
 * What about [RemoteUserMiddleware](https://docs.djangoproject.com/en/5.0/howto/auth-remote-user/)?
+* Should this package help with [Wide Key `=` Equals Value Logging](https://cov.ing/ton/blog/2026/02/22/wini-wide-key-equals-value-logging/) now that it is already starting to customize Gunicorn?
 * Are there Free/Libre/Open Source alternatives to Cloudflare Access and Okta that I can run
   end-to-end tests against?

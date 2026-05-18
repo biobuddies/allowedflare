@@ -35,7 +35,7 @@ def test_clean_username_private_domain_removed(monkeypatch):
 
 def test_authenticate_off(monkeypatch):
     monkeypatch.setenv('ALLOWEDFLARE_ACCESS_URL', 'off')
-    assert authenticate({}) == ('', 'Allowedflare is off', {})
+    assert authenticate({}) == ('', None, 'Allowedflare is off', {})
 
 
 # TODO make these offline
@@ -44,24 +44,29 @@ def test_authenticate_off(monkeypatch):
 # TODO check Cf-Access-Jwt-Assertion header as fallback, or whatever `cloudflared curl` sets
 def test_authenticate_no_cookie(monkeypatch):
     monkeypatch.setenv('ALLOWEDFLARE_ACCESS_URL', 'https://demo.cloudflareaccess.com')
-    assert authenticate({}) == ('', 'Allowedflare could not find CF_Authorization cookie', {})
+    assert authenticate({}) == ('', None, 'Allowedflare could not find CF_Authorization cookie', {})
 
 
 def test_authenticate_invalid_token(monkeypatch):
     monkeypatch.setenv('ALLOWEDFLARE_ACCESS_URL', 'https://demo.cloudflareaccess.com')
-    user, message, token = authenticate({'CF_Authorization': 'invalid'})
+    user, exception_class, message, token = authenticate({'CF_Authorization': 'invalid'})
     assert user == ''
     assert message.startswith('Allowedflare failed to decode CF_Authorization cookie invalid')
+    assert message.endswith(' email=-')
     assert token == {}
+    assert exception_class is not None
 
 
 def test_authenticate_jwk_client_error(monkeypatch):
     private_key = generate_private_key(65537, 1024, default_backend())
     monkeypatch.setenv('ALLOWEDFLARE_ACCESS_URL', 'https://demo.cloudflareaccess.com')
-    user, message, token = authenticate({'CF_Authorization': encode({}, private_key, 'RS256')})
+    user, exception_class, message, token = authenticate(
+        {'CF_Authorization': encode({}, private_key, 'RS256')}
+    )
     assert user == ''
     assert 'Unable to find a signing key that matches' in message
     assert token == {}
+    assert exception_class is not None
 
 
 def test_authenticate_valid_token(mocker, monkeypatch):
@@ -81,6 +86,7 @@ def test_authenticate_valid_token(mocker, monkeypatch):
 
     assert authenticate(cookies) == (
         'firstname.lastname@domain.com',
+        None,
         'Allowedflare authenticated firstname.lastname@domain.com',
         token,
     )

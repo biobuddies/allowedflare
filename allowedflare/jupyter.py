@@ -10,7 +10,7 @@ class JupyterHub(Authenticator):
     # New configurable trait
 
     async def get_authenticated_user(self, handler: RequestHandler, data):
-        username, message, token = authenticate(handler.request.cookies)
+        username, _, message, token = authenticate(handler.request.cookies)
         self.log.info(message)
         if not username:
             return None
