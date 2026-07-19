@@ -25,13 +25,22 @@ def configure_user(user: User, request: HttpRequest, created: bool) -> User:
 
     To match `RemoteUserBackend.configure_user()`, `request` and `created` arguments are accepted
     but unused. The `self` argument is omitted to make user-provided replacement easier.
+
+    Because this runs on every authenticated request, it must only insert rows that are actually
+    missing. A no-op `add()` is not harmless on PostgreSQL: it runs INSERT ... ON CONFLICT DO
+    NOTHING, which consumes a sequence value per attempted row even when nothing is inserted,
+    eventually overflowing the int4 auth_group_permissions.id on busy deployments.
     """
-    user.is_staff = True
-    user.save()
+    if not user.is_staff:
+        user.is_staff = True
+        user.save()
 
     everyone, _ = Group.objects.get_or_create(name='allowedflare_everyone')
-    everyone.permissions.add(*Permission.objects.filter(codename__startswith='view'))
-    user.groups.add(everyone)
+    missing = Permission.objects.filter(codename__startswith='view').exclude(group=everyone)
+    if missing:
+        everyone.permissions.add(*missing)
+    if not user.groups.filter(pk=everyone.pk).exists():
+        user.groups.add(everyone)
     return user
 
 
