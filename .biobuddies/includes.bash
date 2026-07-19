@@ -74,7 +74,7 @@ ASDF_PLUGINS='nodejs tenv uv'
 export ASDF_PLUGINS
 
 # Defined for all operating systems to support Linux containers from MacOS
-DEBS='bash bind9-host curl file fping git less procps tmux tree'
+DEBS='bash ca-certificates bind9-host curl file fping git less procps tmux tree'
 export DEBS
 
 # We should probably deprecate `PACKAGES` in favor of `DEBS` and `BRWS`.
@@ -100,7 +100,8 @@ pathver() {
     echo "$source $actual_version"
     if [[ -f $2 ]]; then
         expected_version=$(cat "$2")
-        if [[ $actual_version != "$expected_version" ]]; then
+        if [[ $actual_version != "$expected_version" &&
+            ${actual_version%.*} != "$expected_version" ]]; then
             echo "ERROR: $source version $actual_version does not match $2 $expected_version"
             return 1
         fi
@@ -154,17 +155,20 @@ a() {
 }
 
 build_twine() {
-    : 'clean, BUILD, and upload python package with TWINE'
-    if [[ $(git describe --exact --tags) != v20* ]]; then
-        echo 'ERROR: Please tag in the gvcount or yucount format'
-        return 1
+    : 'clean, BUILD, check, and optionally upload python package with TWINE'
+    local upload="${1:-}"
+    if [[ $upload != '' ]]; then
+        if [[ $(git describe --exact-match --tags) != v20* ]]; then
+            echo 'ERROR: Please tag in the gvcount or yucount format'
+            return 1
+        fi
+        if [[ $TWINE_USERNAME != '__token__' || -z $TWINE_PASSWORD ]]; then
+            echo 'ERROR: Please set TWINE_USERNAME=__token__ and TWINE_PASSWORD=...'
+            return 1
+        fi
     fi
-    if [[ $TWINE_USERNAME != '__token__' || -z $TWINE_PASSWORD ]]; then
-        echo 'ERROR: Please set TWINE_USERNAME=__token__ and TWINE_PASSWORD=...'
-        return 1
-    fi
-    [[ -d dist ]] || mkdir dist
-    rm -r dist && python -m build && twine upload dist/*
+    rm -rf dist && .venv/bin/python -m build && .venv/bin/python -m twine check --strict dist/*
+    [[ $upload == '' ]] || .venv/bin/python -m twine upload dist/*
 }
 
 cona() {
@@ -219,9 +223,11 @@ dcu() {
     docker compose up "$@"
 }
 
+# https://adamj.eu/tech/2024/01/18/git-improve-diff-histogram/
 expected_git_configuration="
 advice.skippedCherryPicks=false Reduces noise when pull requests are squashed on the server side
 core.commentChar=; Allows # hash character to be used for Markdown headers
+diff.algorithm=histogram Diff better
 diff.colormoved=zebra Distinguishes moved lines from added and removed lines
 init.defaultBranch=main New standard value skips long explanation
 pull.rebase=true Always be rebasing
@@ -293,9 +299,10 @@ asdf is a version manager for node, tenv (terraform, tofu), uv (python), and mor
 
 ups() {
     : 'Uv venv and Pip Sync and similar for npm'
-    [[ ! -f package-lock.json ]] || npm install --frozen-lockfile
+    [[ ! -f package-lock.json ]] || npm clean-install
     [[ -f requirements.txt ]] || return
-    uv venv && uv pip sync "$@" requirements.txt
+    # https://github.com/astral-sh/uv/pull/14309
+    uv venv --clear --no-progress && uv pip sync --no-progress "$@" requirements.txt
 }
 
 asdf_url=https://github.com/asdf-vm/asdf/releases/download/v0.16.7/asdf-v0.16.7-linux-amd64.tar.gz
@@ -339,7 +346,7 @@ forceready() {
                 # shellcheck disable=SC2046,SC2086
                 sudo apt-get install --no-install-recommends --yes $DEBS
             else
-                "echo ERROR: USER=$USER and sudo missing"
+                echo "ERROR: USER=$USER and sudo missing"
                 return 1
             fi
         fi
@@ -506,7 +513,7 @@ release() {
     count=$(git tag --list "$prefix*" | gsed "s/$prefix//" | sort -r | head -1)
     gh release create "$prefix$(printf '%02d' $((${count:-0} + 1)))" --generate-notes
     git fetch --tags
-    [[ $* == build ]] && build_twine
+    [[ $* == build ]] && build_twine upload
 }
 
 summarize() {
