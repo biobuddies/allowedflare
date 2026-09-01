@@ -1,12 +1,12 @@
 """Configure Gunicorn and label its access logs compactly.
 
-st: STatus
-lb: Load Balancer Internet Protocol (IP) address
-ip: client Internet Protocol (IP) address
-rt: Request Time in seconds
-ub: Username for Basic authentication (password not checked)
-uj: Username/email for JSON Web Token (JWT) authentication (checked and prefixed with Exception@)
-rf: ReFerrer
+st STatus
+lb Load Balancer Internet Protocol (IP) address
+ip client Internet Protocol (IP) address
+rt Request Time in seconds
+ub Username for Basic authentication (password not checked)
+uj Username/email for JSON Web Token (JWT) authentication (checked and prefixed with Exception@)
+rf ReFerrer
 """
 
 from ast import literal_eval
