@@ -35,19 +35,21 @@ def clean_username(username: str) -> str:
     return username
 
 
-def authenticate(cookies: Mapping[str, Morsel | str]) -> tuple[str, str, dict]:
+def authenticate(
+    cookies: Mapping[str, Morsel | str],
+) -> tuple[str, type[Exception] | None, str, dict]:
     """
-    Return a tuple with suffix-trimmed username, failure/success message, and decoded token.
+    Return the suffix-trimmed username, exception class, message, and decoded token.
 
     On failure to authenticate, the username will be the empty string `''` and the token will be the
     empty dictionary `{}`.
     """
     url = getenv('ALLOWEDFLARE_ACCESS_URL', 'off')
     if url == 'off':
-        return ('', 'Allowedflare is off', {})
+        return ('', None, 'Allowedflare is off', {})
 
     if 'CF_Authorization' not in cookies:
-        return ('', 'Allowedflare could not find CF_Authorization cookie', {})
+        return ('', None, 'Allowedflare could not find CF_Authorization cookie', {})
 
     morsel_or_string = cookies['CF_Authorization']
     if isinstance(morsel_or_string, Morsel):
@@ -66,21 +68,34 @@ def authenticate(cookies: Mapping[str, Morsel | str]) -> tuple[str, str, dict]:
             audience=environ['ALLOWEDFLARE_AUDIENCE'],
             algorithms=['RS256'],
         )
-    except InvalidTokenError as error:
-        return ('', f'Allowedflare failed to decode CF_Authorization cookie {cookie} {error}', {})
-    except InvalidSignatureError:
-        return ('', f'Allowedflare found invalid signature in CF_Authorization cookie {token}', {})
     except Exception as error:
-        return ('', f'Allowedflare unexpected {error} {token}', {})
+        try:
+            email = decode(cookie, options={'verify_signature': False}).get('email', '-')
+        except Exception:
+            email = '-'
+        return (
+            '',
+            type(error),
+            (
+                f'Allowedflare found invalid signature in CF_Authorization cookie {token}'
+                if isinstance(error, InvalidSignatureError)
+                else f'Allowedflare failed to decode CF_Authorization cookie {cookie} {error}'
+                if isinstance(error, InvalidTokenError)
+                else f'Allowedflare unexpected {error} {token}'
+            )
+            + f' email={email}',
+            {},
+        )
 
     # It looks like people will have email, service tokens will have common_name
     unprocessed_name = token.get('email', token.get('common_name', ''))
     if not unprocessed_name:
         return (
             '',
+            None,
             f'Allowedflare found neither common_name nor email in otherwise valid token {token}',
             {},
         )
 
     name = clean_username(unprocessed_name)
-    return (name, f'Allowedflare authenticated {name}', token)
+    return (name, None, f'Allowedflare authenticated {name}', token)
