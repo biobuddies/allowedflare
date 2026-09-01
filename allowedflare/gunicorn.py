@@ -25,7 +25,7 @@ class UserLogger(Logger):
     """Add j, the validated Cloudflare Access JSON Web Token username, to Gunicorn log atoms.
 
     Gunicorn's u atom remains the decoded Basic authentication username. A rejected token produces
-    ``ExceptionClass@email``; an absent token or missing username produces ``-``.
+    `ExceptionClass@email`; an absent token or missing username produces `-`.
     """
 
     def atoms(
