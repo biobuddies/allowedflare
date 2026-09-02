@@ -17,22 +17,20 @@ name = 'allowedflare'
 readme = 'README.md'
 
 [project.optional-dependencies]
-precommit = [
+pre-commit = [
     'actionlint-py',
-    'codespell',
+    'basedpyright',
     'cookiecutter',
-    'django-stubs',
-    'djangorestframework-stubs[compatible-mypy]',
-    'hadolint-py',
-    'mypy',
-    'pre-commit',
+    'django-upgrade',
+    'djlint',
+    'hadolint-py @ git+https://github.com/AleksaC/hadolint-py.git',
     'pre-commit-hooks',
+    'pyrefly',
     'ruff',
     'shellcheck-py',
     'shfmt-py',
-    'types-setuptools',
     'typos',
-    # uv from asdf
+    'validate-pyproject[all]',
     'yamllint',
 ]
 demo = [
@@ -67,10 +65,15 @@ inline-quotes = 'single'
 [tool.django-stubs]
 django_settings_module = 'demodj.settings'
 
+[tool.basedpyright]
+extends = '.biobuddies/basedpyright.toml'
+
 [tool.ruff]
+extend = '.biobuddies/ruff.toml'
 line-length = 100
 
 [tool.ruff.lint]
+select = ['E4', 'E7', 'E9', 'F']
 ignore = [
     'EM101', # Allow exceptions to use string literals because keeping code as simple as possible is more important than keeping tracebacks as simple as possible.
 ]
@@ -100,3 +103,7 @@ packages = ['allowedflare']
 
 [tool.typos.default.extend-identifiers]
 STatus = 'STatus'
+
+[tool.pyrefly]
+project-excludes = ['allowedflare/django.py', 'allowedflare/gunicorn.py', 'pypi_compatible_build.py']
+project-includes = ['**/*.py*', '**/*.ipynb']

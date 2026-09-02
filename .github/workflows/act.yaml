@@ -1,0 +1,100 @@
+name: act
+defaults:
+    run:
+        shell: bash --noprofile --norc -o errexit -o nounset -o pipefail -o xtrace {0}
+env:
+    ALLOWEDFLARE_EMAIL: person@emailprovider.example
+    ALLOWEDFLARE_PRIVATE_DOMAIN: organization.example
+    CLOUDFLARE_ACCOUNT_ID: 0123456789abcdef0123456789abcdef00
+    CLOUDFLARE_ZONE_ID: 0123456789abcdef0123456789abcdef01
+    # https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+    FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    GITHUB_TOKEN: ${{ github.token }}
+    INSH_TF: tofu
+    PATH: .venv/bin:/home/runner/.local/bin:/home/runner/.local/share/mise/shims:/usr/bin:/bin
+jobs:
+    # Root jobs
+    check:
+        runs-on: ubuntu-latest
+        steps:
+            # Real hash is head_ref on pull_request, ref on push
+            - uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
+                  ref: ${{ github.head_ref || github.ref }}
+            - uses: jdx/mise-action@v3
+              with:
+                  experimental: true
+            - run: mise set-environment
+            - run: mise pre-commit-all
+    tabularize:
+        runs-on: ubuntu-latest
+        steps:
+            # Real hash is head_ref on pull_request, ref on push
+            - uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
+                  ref: ${{ github.head_ref || github.ref }}
+            - uses: jdx/mise-action@v3
+              with:
+                  experimental: true
+                  install: false
+            - run: mise tabularize
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            # Real hash is head_ref on pull_request, ref on push
+            - uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
+                  ref: ${{ github.head_ref || github.ref }}
+            - uses: jdx/mise-action@v3
+              with:
+                  experimental: true
+            - run: |
+                  # shellcheck disable=SC2086
+                  mkdir -p $HOME/code
+                  # shellcheck disable=SC2086
+                  ln -s ../work/allowedflare/allowedflare $HOME/code/allowedflare
+
+            - run: mise test
+
+    # Leaf jobs
+    build-deploy:
+        needs: [check, test]
+        permissions:
+            contents: write
+        runs-on: ubuntu-latest
+        environment:
+            name: >-
+                ${{ github.event_name == 'release'
+                && 'prod'
+                || github.head_ref
+                || github.ref_name }}
+        steps:
+            - uses: actions/checkout@v6
+            - uses: jdx/mise-action@v3
+              with:
+                  experimental: true
+            - run: mise set-environment
+            - run: mise build
+            - run: >-
+                  mise deploy "${{ github.event_name == 'release'
+                  && 'prod'
+                  || github.head_ref
+                  || github.ref_name }}"
+            - if: github.event_name == 'release'
+              run: |
+                  expected=$(git ls-remote --refs origin refs/heads/prod | cut -f 1)
+                  git push "--force-with-lease=refs/heads/prod:$expected" origin HEAD:prod
+
+on: # yamllint disable-line rule:truthy
+    pull_request:
+    push:
+        branches:
+            - main
+    release:
+        types:
+            - published
+    workflow_dispatch:
+run-name: Acting on behalf of ${{ github.actor }}
