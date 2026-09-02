@@ -20,6 +20,8 @@ jobs:
             - run: .venv/bin/python -m manage makemigrations --check
 
     test:
+        env:
+            ALLOWEDFLARE_ACCESS_URL: ${{ secrets.ALLOWEDFLARE_ACCESS_URL }}
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
