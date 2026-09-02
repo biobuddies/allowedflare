@@ -1,1 +1,0 @@
-.biobuddies/justfile
