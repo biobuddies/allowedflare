@@ -2,13 +2,20 @@ from base64 import b64encode
 from datetime import UTC, datetime, timedelta
 
 from cryptography.hazmat.primitives.asymmetric.rsa import generate_private_key
-
-from allowedflare.gunicorn import UserLogger, access_log_format, local_abort
 from gunicorn.config import Config
 from gunicorn.http.message import Request
 from gunicorn.http.wsgi import Response
 from jwt import encode
 from pytest import mark
+
+from allowedflare.gunicorn import (
+    UserLogger,
+    access_log_format,
+    local_abort,
+    post_fork,
+    post_request,
+    pre_request,
+)
 
 
 @mark.parametrize(
@@ -36,8 +43,8 @@ from pytest import mark
         'signature',
     ),
 )
-def test_get_basic_and_jwt_usernames(
-    source, email_regex, expected_basic, expected_jwt, validation, mocker, monkeypatch
+def test_logging(
+    source, email_regex, expected_basic, expected_jwt, validation, capsys, mocker, monkeypatch
 ):
     private_key = generate_private_key(65537, 1024)
     token = (
@@ -65,41 +72,44 @@ def test_get_basic_and_jwt_usernames(
     monkeypatch.setenv('ALLOWEDFLARE_ACCESS_URL', 'https://demo.cloudflareaccess.com')
     monkeypatch.setenv('ALLOWEDFLARE_AUDIENCE', 'audience')
     monkeypatch.setenv('ALLOWEDFLARE_EMAIL_REGEX', email_regex)
-    assert (
-        UserLogger(Config())
-        .atoms(
-            mocker.create_autospec(
-                Response,
-                instance=True,
-                status='200',
-                response_length=1024,
-                sent=1024,
-                headers=(('Content-Type', 'text/plain'),),
+    configuration = Config()
+    configuration.set('access_log_format', access_log_format)
+    configuration.set('accesslog', '-')
+    logger = UserLogger(configuration)
+    logger.access(
+        mocker.create_autospec(
+            Response,
+            instance=True,
+            status='200',
+            response_length=1024,
+            sent=1024,
+            headers=(('Content-Type', 'text/plain'),),
+        ),
+        mocker.create_autospec(Request, instance=True, headers=()),
+        {
+            'REQUEST_METHOD': 'GET',
+            'RAW_URI': '/my/path?foo=bar',
+            'PATH_INFO': '/my/path',
+            'QUERY_STRING': 'foo=bar',
+            'SERVER_PROTOCOL': 'HTTP/1.1',
+            **(
+                {'HTTP_COOKIE': f'CF_Authorization={token}'}
+                if source == 'cookie'
+                else {'HTTP_AUTHORIZATION': f'Basic {b64encode(b"leia:password").decode()}'}
+                if source == 'basic'
+                else {
+                    'HTTP_AUTHORIZATION': f'Basic {b64encode(b"leia:password").decode()}',
+                    'HTTP_CF_ACCESS_JWT_ASSERTION': token,
+                }
+                if source == 'both'
+                else {'HTTP_CF_ACCESS_JWT_ASSERTION': token}
             ),
-            mocker.create_autospec(Request, instance=True, headers=()),
-            {
-                'REQUEST_METHOD': 'GET',
-                'RAW_URI': '/my/path?foo=bar',
-                'PATH_INFO': '/my/path',
-                'QUERY_STRING': 'foo=bar',
-                'SERVER_PROTOCOL': 'HTTP/1.1',
-                **(
-                    {'HTTP_COOKIE': f'CF_Authorization={token}'}
-                    if source == 'cookie'
-                    else {'HTTP_AUTHORIZATION': f'Basic {b64encode(b"leia:password").decode()}'}
-                    if source == 'basic'
-                    else {
-                        'HTTP_AUTHORIZATION': f'Basic {b64encode(b"leia:password").decode()}',
-                        'HTTP_CF_ACCESS_JWT_ASSERTION': token,
-                    }
-                    if source == 'both'
-                    else {'HTTP_CF_ACCESS_JWT_ASSERTION': token}
-                ),
-            },
-            timedelta(seconds=1),
-        )
-        .items()
-        >= {'u': expected_basic, 'j': expected_jwt}.items()
+        },
+        timedelta(seconds=1),
+    )
+    assert capsys.readouterr().out.rstrip() == (
+        'GET /my/path?foo=bar HTTP/1.1 st=200 lb=- ip=- rt=1.000000s '
+        f'ub={expected_basic} uj={expected_jwt} rf=-'
     )
 
 
@@ -107,7 +117,26 @@ def test_access_log_labels_basic_and_jwt_users():
     assert 'ub=%(u)s uj=%(j)s' in access_log_format
 
 
-def test_worker_abort_logs_request(mocker):
-    worker = mocker.MagicMock(unfinished_request='GET /slow')
+def test_concurrent_requests_log_only_unfinished_request(capsys, mocker):
+    class StandardOutputLogger:
+        def critical(self, message):
+            print(f'CRITICAL {message}')
+
+        def debug(self, message):
+            print(f'DEBUG {message}')
+
+    worker = mocker.Mock(log=StandardOutputLogger())
+    slow_request = mocker.Mock(method='GET', uri='/sleep/')
+    fast_request = mocker.Mock(method='GET', uri='/admin/login/')
+    post_fork(None, worker)
+
+    pre_request(worker, slow_request)
+    pre_request(worker, fast_request)
+    post_request(worker, fast_request, {}, None)
     local_abort(worker)
-    worker.log.critical.assert_called_once_with('Interrupted: GET /slow')
+
+    assert capsys.readouterr().out.splitlines() == [
+        'DEBUG GET /sleep/',
+        'DEBUG GET /admin/login/',
+        'CRITICAL Interrupted: GET /sleep/',
+    ]

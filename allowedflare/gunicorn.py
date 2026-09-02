@@ -54,17 +54,22 @@ def pre_request(worker, request):
     """Called just before a worker processes the request."""
     message = f'{request.method} {request.uri}'
     worker.log.debug(message)
-    worker.unfinished_request = message
+    worker.unfinished_requests[request] = message
 
 
-def post_request(worker, _request, _environment, _response):
+def post_request(worker, request, _environment, _response):
     """Called after a worker processes the request."""
-    worker.unfinished_response = ''
+    worker.unfinished_requests.pop(request, None)
+
+
+def post_fork(_server, worker):
+    """Initialize request state in each worker process."""
+    worker.unfinished_requests = {}
 
 
 def local_abort(worker):
     """Called when a worker received the SIGABRT signal. This call generally happens on timeout."""
-    if message := getattr(worker, 'unfinished_request'):
+    for message in tuple(worker.unfinished_requests.values()):
         worker.log.critical(f'Interrupted: {message}')
 
 
@@ -73,6 +78,7 @@ def configure(namespace):
         access_log_format=access_log_format,
         accesslog='-',
         logging_class=UserLogger,
+        post_fork=post_fork,
         post_request=post_request,
         pre_request=pre_request,
         reload=bool(literal_eval(getenv('GUNICORN_RELOAD', 'False'))),
