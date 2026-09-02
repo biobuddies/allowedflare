@@ -59,7 +59,7 @@ def pre_request(worker, request):
 
 def post_request(worker, _request, _environment, _response):
     """Called after a worker processes the request."""
-    worker.unfinished_response = ''
+    worker.unfinished_request = ''
 
 
 def local_abort(worker):

@@ -1,9 +1,16 @@
 from base64 import b64encode
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
+from socket import create_connection, socket
+from subprocess import PIPE, STDOUT, Popen
+from sys import executable
+from time import monotonic, sleep
 
 from cryptography.hazmat.primitives.asymmetric.rsa import generate_private_key
+from requests import get
+from requests.exceptions import RequestException
 
-from allowedflare.gunicorn import UserLogger, access_log_format, local_abort
+from allowedflare.gunicorn import UserLogger, access_log_format
 from gunicorn.config import Config
 from gunicorn.http.message import Request
 from gunicorn.http.wsgi import Response
@@ -107,7 +114,58 @@ def test_access_log_labels_basic_and_jwt_users():
     assert 'ub=%(u)s uj=%(j)s' in access_log_format
 
 
-def test_worker_abort_logs_request(mocker):
-    worker = mocker.MagicMock(unfinished_request='GET /slow')
-    local_abort(worker)
-    worker.log.critical.assert_called_once_with('Interrupted: GET /slow')
+def test_timeout_then_response_logs_independent_requests():
+    with socket() as reserved_socket:
+        reserved_socket.bind(('127.0.0.1', 0))
+        port = reserved_socket.getsockname()[1]
+
+    process = Popen(
+        [
+            str(Path(executable).with_name('gunicorn')),
+            '--bind',
+            f'127.0.0.1:{port}',
+            '--config',
+            str(Path(__file__).parents[1] / 'gunicorn.conf.py'),
+            '--timeout',
+            '1',
+            '--workers',
+            '1',
+            'demodj.wsgi',
+        ],
+        stdout=PIPE,
+        stderr=STDOUT,
+        text=True,
+    )
+    try:
+        deadline = monotonic() + 10
+        while True:
+            try:
+                with create_connection(('127.0.0.1', port), timeout=0.1):
+                    pass
+                break
+            except OSError:
+                if monotonic() >= deadline:
+                    raise
+                sleep(0.05)
+
+        try:
+            get(f'http://127.0.0.1:{port}/sleep/', timeout=5)
+        except RequestException:
+            pass
+
+        while True:
+            try:
+                response = get(f'http://127.0.0.1:{port}/admin/login/', timeout=1)
+                break
+            except RequestException:
+                if monotonic() >= deadline:
+                    raise
+                sleep(0.05)
+    finally:
+        process.terminate()
+        stdout = process.communicate(timeout=5)[0]
+
+    assert response.status_code == 200
+    assert 'Interrupted: GET /sleep/' in stdout
+    assert 'GET /admin/login/ HTTP/1.1 st=200' in stdout
+    assert 'Interrupted: GET /admin/login/' not in stdout
