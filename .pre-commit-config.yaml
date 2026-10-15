@@ -7,7 +7,7 @@ repos:
           # Change line numbers
           - id: end-of-file-fixer
           - id: prettier-write
-            exclude: ^allowedflare/login\.dj\.html$
+            exclude: ^(allowedflare/login\.dj\.html|\.biobuddies/typos\.toml)$
           - id: ruff-check-fix
           - id: ruff-format
           - id: shfmt
