@@ -55,7 +55,7 @@ Homepage = 'https://github.com/biobuddies/allowedflare'
 ignore-words-list = 'afterall'
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = 'demodj.settings'
+DJANGO_SETTINGS_MODULE = 'config.settings'
 
 [tool.ruff.format]
 quote-style = 'single'
@@ -65,7 +65,7 @@ skip-magic-trailing-comma = true
 inline-quotes = 'single'
 
 [tool.django-stubs]
-django_settings_module = 'demodj.settings'
+django_settings_module = 'config.settings'
 
 [tool.ruff]
 line-length = 100
