@@ -1,4 +1,5 @@
 from jwt import encode
+from jwt.algorithms import RSAAlgorithm
 from cryptography.hazmat.primitives.asymmetric.rsa import generate_private_key
 from cryptography.hazmat.backends import default_backend
 from datetime import UTC, datetime
@@ -57,8 +58,14 @@ def test_authenticate_invalid_token(monkeypatch):
     assert exception_class is not None
 
 
-def test_authenticate_jwk_client_error():
+def test_authenticate_jwk_client_error(mocker, monkeypatch):
     private_key = generate_private_key(65537, 1024, default_backend())
+    other_key = generate_private_key(65537, 1024, default_backend()).public_key()
+    monkeypatch.setenv('ALLOWEDFLARE_ACCESS_URL', 'https://demo.cloudflareaccess.com')
+    mocker.patch(
+        'allowedflare.core.PyJWKClient.fetch_data',
+        return_value={'keys': [{**RSAAlgorithm.to_jwk(other_key, as_dict=True), 'kid': 'other'}]},
+    )
     user, exception_class, message, token = authenticate(
         {'CF_Authorization': encode({}, private_key, 'RS256')}
     )
